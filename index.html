@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.8.0/dist/leaflet.css"
+    integrity="sha512-hoalWLoI8r4UszCkZ5kL8vayOGVae1oxXe/2A4AO6J9+580uKHDO3JdHb7NzwwzK5xr/Fs0W40kiNHxM9vyTtQ=="
+    crossorigin=""/>
+    <!-- Make sure you put this AFTER Leaflet's CSS -->
+    <script src="https://unpkg.com/leaflet@1.8.0/dist/leaflet.js"
+    integrity="sha512-BB3hKbKWOc9Ez/TAwyWxNXeoV9c1v6FIeYiBieIWkpLjauysF18NzgR1MBNBXf8/KABdlkX68nAhlwcDFLGPCQ=="
+    crossorigin=""></script>
+    <script src="https://d3js.org/d3.v6.js"></script>
+    <link rel="stylesheet" href="./style.css">
+    <script src="./index.js" defer></script>
+    <title>Document</title>
+</head>
+<body>
+    <section>
+        <div id="map"></div>
+        <div id="info-panel">
+            <label for="people">People</label>
+            <select id="people">
+                <option value="" disabled selected>No location selected</option>
+            </select>
+            <section id="designer-info">
+                <h2></h2>
+                <section id="designer-discipline">
+                    <h3>Discipline</h3>
+                    <p></p>
+                </section>
+                <section id="designer-affiliation">
+                    <h3>Affiliation</h3>
+                    <p></p>
+                </section>
+                <section id="designer-description">
+                    <h3>About</h3>
+                    <p id="about-blurb-1"></p>
+                    <p id="about-blurb-2"></p>
+                </section>
+            </section>
+        </div>
+    </section>
+</body>
+</html>
