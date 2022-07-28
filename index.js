@@ -26,6 +26,44 @@
                 // console.log(this.map.getZoom());
             })
 
+            // L.marker([51.5, 50]).addTo(this.map)
+            //     .bindPopup('<img src="DesignBlogImage-1536x1097.jpg" height="200" width="200">', {
+            //     })
+            //     // .openPopup();
+
+            // L.marker([51.5, 60]).addTo(this.map)
+            //     .bindPopup('<img src="DesignBlogImage-1536x1097.jpg">', {
+            //         maxHeight: 300,
+            //         className: "map-popup-1"
+            //     })
+
+            let mrker = L.marker([0, -121.74])
+                .addTo(this.map)
+                .bindPopup(
+                    `
+                        <img src="./assets/images/DavisAmtrak.PNG" height="200" width="275">
+                        <p>During the Spring Quarter of 2019 my Human-Centered Design class at UC Davis
+                        worked with the city of Davis, CA to reimagine the Amtrak station and the surrounding
+                        areas. I developed the project with Rachel Hartsough, the Arts and Culture Manager
+                        for the City of Davis with the aim of supporting a larger study by the city to explore
+                        ways to improve the station, decrease traffic congestion and encourage biking and
+                        public transportation to and from the station. Utilizing a human-centered approach
+                        to the challenge, the class interviewed potential users, developed a unique frame on
+                        the challenge, then developed concepts, prototyped the ideas, tested them, and then
+                        finally, presented their findings to a group of consultants and city officials at Davis City
+                        Hall.</p>
+                    `, 
+                
+                
+                {
+                    maxHeight: 300,
+                    className: "map-popup-2"
+
+                })
+            
+            // console.log(mrker.getContent())
+                // .openPopup();
+
             // sometimes grey area happens, sometimes it doesn't, this hoepfully helps it guaranteed not problem
             // think the problem happens when I change the height of the map via css and live reloads the map
             // this code should prevent this from happening when resizing the map in the css
@@ -90,7 +128,6 @@
                     // if (marker.isPopupOpen()) {
                     //     marker.closePopup();
                     // }
-                    console.log(marker.toGeoJSON());
                     controller.setSelectedMarkerData(uniqueCoords[uniqueCoordsKeys[i]]);
                 })
 
@@ -119,10 +156,11 @@
             for (let i of arrForCheckingIntersections) {
                 // console.log(i)
                 for (let j of arrForCheckingIntersections) {
-                    if (i === j) {
+                    if (i === j) { // marker always intersects with itself
                         continue;
                     }
                     const distance = Math.sqrt(Math.pow(i.coords.x - j.coords.x, 2) + Math.pow(i.coords.y - j.coords.y, 2));
+                    // const midpoint = [i.coords.x - j.coords.x, ]
                     // console.log(distance);
                     const r1 = i.radius;
                     const r2 = j.radius;
@@ -130,16 +168,43 @@
                         i.markerRef.setStyle({fillColor: "black"});
                         j.markerRef.setStyle({fillColor: "black"});
                         // console.log("Circle B is inside A");
+                        // let marker = new L.circleMarker(
+                        //     [uniqueCoords[uniqueCoordsKeys[i]].lat, uniqueCoords[uniqueCoordsKeys[i]].lng],
+                        //     {
+                        //         color: "blue",
+                        //         radius: r1 + r2,
+                        //         stroke: false,
+                        //         fillOpacity: 0.5
+                        //     }
+                        // )
                     }
                     else if (distance <= r2 - r1) {
                         i.markerRef.setStyle({fillColor: "black"});
                         j.markerRef.setStyle({fillColor: "black"});
                         // console.log("Circle A is inside B");
+                        // let marker = new L.circleMarker(
+                        //     [uniqueCoords[uniqueCoordsKeys[i]].lat, uniqueCoords[uniqueCoordsKeys[i]].lng],
+                        //     {
+                        //         color: "#FF5710",
+                        //         radius: uniqueCoords[uniqueCoordsKeys[i]].circleRadius + mapManager.map.getZoom(),
+                        //         stroke: false,
+                        //         fillOpacity: 0.5
+                        //     }
+                        // )
                     }
                     else if (distance < r1 + r2) {
                         i.markerRef.setStyle({fillColor: "black"});
                         j.markerRef.setStyle({fillColor: "black"});
                         // console.log("Circle intersect to each other");
+                        // let marker = new L.circleMarker(
+                        //     [uniqueCoords[uniqueCoordsKeys[i]].lat, uniqueCoords[uniqueCoordsKeys[i]].lng],
+                        //     {
+                        //         color: "#FF5710",
+                        //         radius: uniqueCoords[uniqueCoordsKeys[i]].circleRadius + mapManager.map.getZoom(),
+                        //         stroke: false,
+                        //         fillOpacity: 0.5
+                        //     }
+                        // )
                     }
                     else if (distance == r1 + r2) {
                         // console.log("Circle touch to each other");

@@ -27,3 +27,15 @@ body {
     width: 17vw;
     opacity: 90%;
 }
+
+.map-popup-1 .leaflet-popup-content-wrapper {
+    background-color: blue;
+    
+}
+
+.map-popup-2 .leaflet-popup-content-wrapper, .map-popup-2 .leaflet-popup-tip {
+    background-color: red;
+    border-radius: 0;
+    color: white;
+}
+
