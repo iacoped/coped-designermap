@@ -1,4 +1,5 @@
 // Protip: https://stackoverflow.com/questions/23429203/weird-behavior-with-objects-console-log
+import { markerMergeV1, markerMergeV2} from "./markerMerge.js";
 (() => {
     'use strict';
     const model = {
@@ -102,10 +103,9 @@
             const renderMode = controller.getMarkerViewMode();
             const uniqueCoordsKeys = Object.keys(data);
             if (renderMode === "merge") {
-                let arrForCheckingIntersections = [];
-                // let mergedMarkers = [];
+                const markers = [];
                 for (let i = 0; i < uniqueCoordsKeys.length; i++) {
-                    arrForCheckingIntersections.push({
+                    markers.push({
                         id: uniqueCoordsKeys[i],
                         coords: mapManager.map.latLngToContainerPoint([data[uniqueCoordsKeys[i]].lat, data[uniqueCoordsKeys[i]].lng]),
                         radius: data[uniqueCoordsKeys[i]].people.length + mapManager.map.getZoom(),
@@ -114,69 +114,10 @@
                         inGroup: false
                     });
                 }
-                
-                // While intersections still exist:
-                //   1. for each marker m1 that is not in a group:
-                //      1. find any markers m2 that are not in a group and m1 != m2, combine them into merged marker (add radius, find midpoint of i and marker)
-                //      2. mark intersecting markers as "merged" already (they should not be considered anymore)
-                //      3. don't mark i as merged (merged marker might end up intersecting with it in future)
-                // let i = 0;
-                let intersectionsStillExist = true; 
-                while (intersectionsStillExist) {
-                    intersectionsStillExist = false;
-                    // console.log(arrForCheckingIntersections);
-                    for (let i of arrForCheckingIntersections) {
-                        if (i.inGroup) {
-                            continue;
-                        }
-                        // let mergedMarker = JSON.parse(JSON.stringify(i));
-                        // mergedMarker.merged = false;
-                        // i.merged = true;
-                        for (let j of arrForCheckingIntersections) {
-                            // if they are the same or already in the same group, don't compare it
-                            if (i.id === j.id || j.inGroup) {
-                                continue;
-                            }
-                            // logic for computing intersection
-                            const distance = Math.sqrt(Math.pow(i.coords.x - j.coords.x, 2) + Math.pow(i.coords.y - j.coords.y, 2));
-                            let r1 = i.radius;
-                            let r2 = j.radius;
-                            if (distance <= r1 - r2 || distance <= r2 - r1 || distance < r1 + r2 || distance == r1 + r2) {
-                                intersectionsStillExist = true;
-                                // decide rules for the new marker groups size and position
-                                if (i.radius > j.radius) {
-                                    i.members.push(j.id);
-                                    // i.members = i.members.concat(j.members);
-                                    i.people = i.people.concat(j.people);
-                                    // j.members = [];
-                                    j.inGroup = true;
-                                    i.radius += 1;
-                                } else {
-                                    j.members.push(i.id);
-                                    // i.members = i.members.concat(j.members);
-                                    j.people = j.people.concat(i.people);
-                                    // j.members = [];
-                                    i.inGroup = true;
-                                    j.radius += 1;
-                                }
-                                // i.radius = i.radius + 1;
-                                // const midpoint = {
-                                //     x: (i.coords.x + j.coords.x) / 2,
-                                //     y: (i.coords.y + j.coords.y) / 2
-                                // }
-                                // i.coords.x = midpoint.x;
-                                // i.coords.y = midpoint.y;
-                                
-                
-                                
-                            }  
-                        }
-                    }
-                }
-                // all the markers that are marked inGroup are already part of a group
-                arrForCheckingIntersections = arrForCheckingIntersections.filter(markerGroup => !markerGroup.inGroup);
-                console.log(arrForCheckingIntersections)
-                for (let i of arrForCheckingIntersections) {
+
+                const mergedMarkers = markerMergeV1(markers);
+
+                for (let i of mergedMarkers) {
                     let marker = new L.circleMarker(
                         mapManager.map.containerPointToLatLng(i.coords),
                         {
@@ -326,7 +267,7 @@
         },
 
         async loadAndProcessDataset() {
-            const data = await d3.csv("./CoPED advisory list 2021-1.csv", d3.autoType);
+            const data = await d3.csv("./data/CoPED advisory list 2021-1.csv", d3.autoType);
             data.sort((a,b) => b["Number"] - a["Number"]);
 
             // group data based on latitude and longitude
