@@ -154,15 +154,43 @@ import { markerMergeV1, markerMergeV2} from "./markerMerge.js";
                 }
 
             } else {
+                const markers = [];
                 for (let i = 0; i < uniqueCoordsKeys.length; i++) {
-                    // let popupContent = `${uniqueCoords[uniqueCoordsKeys[i]].people.length}`;
-                    
+                    markers.push({
+                        id: uniqueCoordsKeys[i],
+                        latlng: [data[uniqueCoordsKeys[i]].lat, data[uniqueCoordsKeys[i]].lng],
+                        radius: data[uniqueCoordsKeys[i]].people.length + mapManager.map.getZoom(),
+                        people: data[uniqueCoordsKeys[i]].people,
+                    });
+                }
+
+                markers.forEach((marker) => {
+                    const regionCounts = {
+                        "fakeRegionForLogic": -Infinity
+                    };
+                    let mostCommonRegion = "fakeRegionForLogic";
+                    for (let i = 0; i < marker.people.length; i++) {
+                        const region = marker.people[i].region;
+                        if (!(region in regionCounts)) {
+                            regionCounts[region] = 1;
+                        } else {
+                            regionCounts[region]++;
+                        }
+                        if (regionCounts[region] > regionCounts[mostCommonRegion]) {
+                            mostCommonRegion = region;
+                        }
+                    }
+                    marker.mostCommonRegion = mostCommonRegion;
+                    // console.log(regionCounts);
+                })
+
+                for (let i = 0; i < markers.length; i++) {
                     // console.log(mapManager.map.latLngToContainerPoint([uniqueCoords[uniqueCoordsKeys[i]].lat, uniqueCoords[uniqueCoordsKeys[i]].lng]));
                     let marker = new L.circleMarker(
-                        [data[uniqueCoordsKeys[i]].lat, data[uniqueCoordsKeys[i]].lng],
+                        markers[i].latlng,
                         {
                             color: "#FF5710",
-                            radius: data[uniqueCoordsKeys[i]].people.length + mapManager.map.getZoom(),
+                            radius: markers[i].people.length + mapManager.map.getZoom(),
                             stroke: false,
                             fillOpacity: 0.5
                         }
@@ -178,7 +206,7 @@ import { markerMergeV1, markerMergeV2} from "./markerMerge.js";
                         // if (marker.isPopupOpen()) {
                         //     marker.closePopup();
                         // }
-                        controller.setSelectedMarkerData(data[uniqueCoordsKeys[i]]);
+                        controller.setSelectedMarkerData(markers[i]);
                     })
 
                     marker.on("mouseover", () => {
@@ -201,12 +229,15 @@ import { markerMergeV1, markerMergeV2} from "./markerMerge.js";
 
                     marker.addTo(mapManager.map);
                 }
+
+                
             }
         }
     }
 
     const controlPanelView = {
         init() {
+            this.regionDOMEle = document.querySelector("#region");
             this.dropdownDOMEle = document.querySelector("#people");
             this.dropdownDOMEle.addEventListener("change", (e) => {
                 const data = controller.getSelectedMarkerData();
@@ -219,7 +250,6 @@ import { markerMergeV1, markerMergeV2} from "./markerMerge.js";
                         break;
                     }
                 }
-                console.log(data.people[index])
                 document.querySelector("#designer-info h2").innerHTML = data.people[index].name;
                 document.querySelector("#designer-discipline p").innerHTML = data.people[index].discipline;
                 document.querySelector("#designer-affiliation p").innerHTML = data.people[index].affiliation;
@@ -240,19 +270,22 @@ import { markerMergeV1, markerMergeV2} from "./markerMerge.js";
 
         render() {
             const data = controller.getSelectedMarkerData();
-            // console.log(data);
-            controlPanelView.dropdownDOMEle.innerHTML = "";
+            this.dropdownDOMEle.innerHTML = "";
             if (!data) {
-                controlPanelView.dropdownDOMEle.innerHTML = `<option value="" disabled selected>No location selected</option>`;
+                this.dropdownDOMEle.innerHTML = `<option value="" disabled selected>No location selected</option>`;
             } else {
-                controlPanelView.dropdownDOMEle.innerHTML = `<option value="" disabled selected>Select a designer</option>`;
+                // only implemented in merge mode currently
+                if (data.mostCommonRegion) {
+                    this.regionDOMEle.innerHTML = data.mostCommonRegion;
+                }
+                this.dropdownDOMEle.innerHTML = `<option value="" disabled selected>Select a designer</option>`;
                 // <option value="" disabled selected>Select your option</option>
                 for (let j = 0; j < data.people.length; j++) {
                     const person = data.people[j];
                     let optionDOMEle = document.createElement("option");
                     optionDOMEle.value = `${person.id}`;
                     optionDOMEle.textContent = person.name;
-                    controlPanelView.dropdownDOMEle.appendChild(optionDOMEle);
+                    this.dropdownDOMEle.appendChild(optionDOMEle);
                 }
             }
             
@@ -286,8 +319,9 @@ import { markerMergeV1, markerMergeV2} from "./markerMerge.js";
                     // b/c multiple people could have same names, can't use that to identify which person to show info
                     id: `${latlnString}-${uniqueCoords[latlnString].people.length}`, 
                     name: datum["Full Name"],
-                    affiliation: datum["Firm/Lab/Organization/\nCenter Name"],
                     discipline: datum["Discipline"],
+                    affiliation: datum["Firm/Lab/Organization/\nCenter Name"],
+                    region: datum["Region"],
                     aboutBlurb1: datum["notes"],
                     aboutBlurb2: datum["Possible Speakers"]
                 })
