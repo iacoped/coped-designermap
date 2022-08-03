@@ -153,6 +153,5 @@ export function markerMergeV2(markers) {
     }
     // all the markers that are marked inGroup are already part of a group
     const mergedMarkers = markers.filter(markerGroup => !markerGroup.inGroup);
-    console.log(mergedMarkers);
     return mergedMarkers;
 }

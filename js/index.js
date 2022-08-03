@@ -1,4 +1,6 @@
 // Protip: https://stackoverflow.com/questions/23429203/weird-behavior-with-objects-console-log
+import {csv} from "https://cdn.skypack.dev/d3-fetch@3"; // import just d3's csv capabilities without loading entire library
+
 import { markerMergeV1, markerMergeV2} from "./markerMerge.js";
 (() => {
     'use strict';
@@ -10,9 +12,10 @@ import { markerMergeV1, markerMergeV2} from "./markerMerge.js";
 
     // perhaps I will combine mapManager and markerManager into mapView since markers are on the mapview
     const mapManager = {
-        init() {
+        async init() {
             this.map = L.map('map', {
                 preferCanvas: true,
+                // maxBoundsViscosity: 1.0
             }
             ).setView([37.439974, -15.117188], 1);
             
@@ -21,14 +24,65 @@ import { markerMergeV1, markerMergeV2} from "./markerMerge.js";
                 markerManager.renderMarkers();
                 // console.log(this.map.getZoom());
             })
-
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            // https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}{r}.png
+            // https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png
+            // https://stamen-tiles-{s}.a.ssl.fastly.net/toner-background/{z}/{x}/{y}{r}.{ext}
+            // ^^^ this one has nice black and white scheme as required, but looks like tiles aren't available
+            // once you get to zoom level ~3, throws bunch of errors in console.
+            L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/toner-background/{z}/{x}/{y}{r}.png', {
                 maxZoom: 19,
                 minZoom: 2,
-                
+                noWrap: true,
+                // https://stackoverflow.com/questions/47477956/nowrap-option-on-tilelayer-is-only-partially-working
+                bounds: [ // stops leaflet from requesting tiles outside map bounds (causes HTTP 400)
+                    [-90, -180],
+                    [90, 180]
+                ],
                 attribution: '© OpenStreetMap'
             }).addTo(this.map);
 
+            // const url = "../data/countries.geo.json";
+
+            const fetchJson = async (url) => {
+                try {
+                    const data = await fetch(url);
+                    const response = await data.json();  
+                    return response;
+                } catch (error) {
+                    console.log(error);
+                }
+            };
+
+            // const landGeoJSON = await fetchJson("../data/countries.geo.json");
+            // L.geoJson(landGeoJSON, { // initialize layer with data
+            //     style: {
+            //         'weight': 1,
+            //         'color': 'black',
+            //         'fillColor': 'white',
+            //         'fillOpacity': 0.9
+            //     }
+            // }).addTo(this.map); // Add layer to map
+
+            // const waterGeoJSON = await fetchJson("../data/earth-waterbodies.geo.json");
+            // L.geoJson(waterGeoJSON, { // initialize layer with data
+            //     style: {
+            //         'weight': 1,
+            //         'color': 'black',
+            //         'fillColor': 'black',
+            //         'fillOpacity': 1
+            //     }
+            // }).addTo(this.map); // Add layer to map
+
+            // fetch('../data/countries.geo.json', function (geojson) { // load file
+            //     console.log("done")
+            //     L.geoJson(geojson, { // initialize layer with data
+            //         style: {
+            //             'weight': 1,
+            //             'color': 'black',
+            //             'fillColor': 'yellow'
+            //         }
+            //     }).addTo(this.map); // Add layer to map
+            // });
             
 
             // L.marker([51.5, 50]).addTo(this.map)
