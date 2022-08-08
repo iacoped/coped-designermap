@@ -1,13 +1,16 @@
 // Protip: https://stackoverflow.com/questions/23429203/weird-behavior-with-objects-console-log
-import {csv} from "https://cdn.skypack.dev/d3-fetch@3"; // import just d3's csv capabilities without loading entire library
+// import {csv} from "https://cdn.skypack.dev/d3-fetch@3"; // import just d3's csv capabilities without loading entire library
 
-import { markerMergeV1, markerMergeV2} from "./markerMerge.js";
+import { markerMergeV1, markerMergeV2, markerMergeV3, markerMergeV4, markerMergeV5 } from "./markerMerge.js";
+import { getRandCoordsWithinCircle } from "./geometry/getRandCoordsWithinCircle.js";
+import { getDistanceBetweenTwoPoints } from "./geometry/getDistanceBetweenTwoPoints.js";
+import { twoCirclesOverlap } from "./geometry/twoCirclesOverlap.js";
 (() => {
     'use strict';
     const model = {
         data: null,
         selectedMarkerData: null,
-        markerViewMode: "overlap"
+        markerViewMode: "merge"
     }
 
     // perhaps I will combine mapManager and markerManager into mapView since markers are on the mapview
@@ -15,13 +18,15 @@ import { markerMergeV1, markerMergeV2} from "./markerMerge.js";
         async init() {
             this.map = L.map('map', {
                 preferCanvas: true,
+                // maxZoom: 15
                 // maxBoundsViscosity: 1.0
             }
             ).setView([37.439974, -15.117188], 1);
             
             this.map.on("zoom", () => {
-                console.log("view reset");
+                // console.log("view reset");
                 markerManager.renderMarkers();
+                
                 // console.log(this.map.getZoom());
             })
             // https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}{r}.png
@@ -30,8 +35,8 @@ import { markerMergeV1, markerMergeV2} from "./markerMerge.js";
             // ^^^ this one has nice black and white scheme as required, but looks like tiles aren't available
             // once you get to zoom level ~3, throws bunch of errors in console.
             L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/toner-background/{z}/{x}/{y}{r}.png', {
-                maxZoom: 19,
-                minZoom: 2,
+                maxZoom: 12,
+                minZoom: 3,
                 noWrap: true,
                 // https://stackoverflow.com/questions/47477956/nowrap-option-on-tilelayer-is-only-partially-working
                 bounds: [ // stops leaflet from requesting tiles outside map bounds (causes HTTP 400)
@@ -157,55 +162,190 @@ import { markerMergeV1, markerMergeV2} from "./markerMerge.js";
             const renderMode = controller.getMarkerViewMode();
             const uniqueCoordsKeys = Object.keys(data);
             if (renderMode === "merge") {
-                const markers = [];
+                let markers = [];
                 for (let i = 0; i < uniqueCoordsKeys.length; i++) {
                     markers.push({
                         id: uniqueCoordsKeys[i],
                         coords: mapManager.map.latLngToContainerPoint([data[uniqueCoordsKeys[i]].lat, data[uniqueCoordsKeys[i]].lng]),
-                        radius: data[uniqueCoordsKeys[i]].people.length + mapManager.map.getZoom(),
+                        radius: data[uniqueCoordsKeys[i]].people.length + Math.log(mapManager.map.getZoom() * 100), // data[uniqueCoordsKeys[i]].people.length > 5 ? data[uniqueCoordsKeys[i]].people.length + mapManager.map.getZoom() * 0.5 : data[uniqueCoordsKeys[i]].people.length + 2 + mapManager.map.getZoom(),
                         people: data[uniqueCoordsKeys[i]].people,
                         members: [],
                         inGroup: false
                     });
                 }
+                const radiusOfMarkerRepresentingOnePerson = 1 + Math.log(mapManager.map.getZoom() * 100);
+                markers = markerMergeV5(markers);
+                // console.log(markers);
+                
+                // what's the radius of a marker representing 1 person?
+                // Idea: At any zoom level, after merging, if marker reps just 1 person, make it clickable and show that person's info. 
+                // else, for markers who rep N > 1 person, split them into N markers reping 1 person if: 
+                // radius x 2 circle doesn't intersect with any markers?
+                let splitMarkers = [];
+                splitMarkers = markers;
+                // console.log(markers[0]);
+                // for (let i of markers) {
+                //     // TODO: add additional rule determining if split occurs or not
+                //     // assign bubbles coordinates such that no bubble overlaps
+                //     let splitAllowed = true;
+                //     const radiusOfCircleForSplitting = (i.radius * 2) + (i.people.length);
+                //     for (let j of markers) {
+                //         if (i.id === j.id) {
+                //             continue;
+                //         }
+                //         const distance = getDistanceBetweenTwoPoints(i.coords, j.coords);
+                //         let r1 = radiusOfCircleForSplitting;
+                //         let r2 = j.radius;
+                //         if (twoCirclesOverlap(r1, r2, distance)) {
+                //             // console.log("no split");
+                //             splitAllowed = false;
+                //         }
+                //     }
+                //     if (i.people.length > 1 && splitAllowed) {
+                        
+                //         let splitBubbles = [];
+                //         for (let person of i.people) {
 
-                const mergedMarkers = markerMergeV1(markers);
+                //             let coordRejected = true;
+                //             let rand = null;
+                //             let tries = 0;
+                //             // coordinate of split bubble cannot result in overlap with another bubble
+                //             while (coordRejected && tries != 1000) {
+                //                 // coord is within a circle that has radius of original merged marker's radius * 2
+                //                 rand = getRandCoordsWithinCircle(i.coords, radiusOfCircleForSplitting, false);
+                //                 coordRejected = false;
+                //                 for (let bubble of splitBubbles) {
+                //                     const distance = getDistanceBetweenTwoPoints(bubble.coords, rand);
+                //                     let r1 = bubble.radius;
+                //                     let r2 = 10;
+                //                     if (distance <= r1 - r2 || distance <= r2 - r1 || distance < r1 + r2 || distance == r1 + r2 || distance < 10) {
+                //                         coordRejected = true;
+                //                     } 
+                //                 }
+                //                 tries++;
+                //                 // console.log(splitBubbles)
+                //             }
+                //             if (tries == 1000 && coordRejected) {
+                //                 console.log(`acceptable position for marker #${splitBubbles.length + 1} could not be found within 1000 attempts for group: `, i)
+                //                 splitAllowed = false;
+                //                 break
+                //             } else {
+                //                 splitBubbles.push({
+                //                     people: [person], 
+                //                     radius: radiusOfMarkerRepresentingOnePerson,
+                //                     coords: {
+                //                         x: rand.x,
+                //                         y: rand.y
+                //                     }
+                //                 });
+                //             }
+                            
+                //         }
+                //         // if (splitBubbles.length != i.people.length) {
+                //         //     console.log(i, "fail")
+                //         // }
+                //         if (splitAllowed) {
+                //             splitMarkers = splitMarkers.concat(splitBubbles);
+                //             i.split = true;
+                //         } else {
+                //             splitMarkers.push(i);
+                //             i.split = false;
+                //         }
+                //         // splitMarkers.push({
+                //         //     people: [person],
+                //         //     radius: 10,
+                //         //     coords: {
+                //         //         x: i.coords.x + rand.x,
+                //         //         y: i.coords.y + rand.y,
+                //         //     }
+                //         // })
+                //     } else {
+                //         i.split = false;
+                //         splitMarkers.push(i);
+                //     }
+                // }
+                
+                // console.log(splitMarkers);
 
-                for (let i of mergedMarkers) {
-                    let marker = new L.circleMarker(
-                        mapManager.map.containerPointToLatLng(i.coords),
-                        {
-                            color: "#FF5710",
-                            radius: i.radius,
-                            stroke: false,
-                            fillOpacity: 0.5
-                        }
-                    )
-                    marker.on("click", (e) => {
-                        console.log("click")
-                        controller.setSelectedMarkerData(i);
-                    })
-                    // i.markerRef = marker;
-                    marker.on("mouseover", () => {
-                        // console.log("wat")
-                        marker.setStyle({fillColor: "#45CAFF"});
-                        // let tooltipPos = marker.getLatLng();
-                        // tooltipPos.lat += (marker.getRadius() * 0.00001);
-                        // console.log(latlng.lat);                    
-                        // marker.openPopup(tooltipPos);
-                    })
+                // shows the circle that was used to generate the split markers.
+                for (let i of markers) {
+                    if (i.split) {
+                        console.log("noep")
+                        let marker = new L.circleMarker(
+                            mapManager.map.containerPointToLatLng(i.coords),
+                            {
+                                color: "orange",
+                                radius: (i.radius * 2) + i.people.length,
+                                stroke: false,
+                                fillOpacity: 0.7
+                            }
+                        )
+                        this.markerDOMEles.push(marker);
+                        marker.bindPopup(`<p>${i}</p>`);
+                        marker.addTo(mapManager.map);
+                    }
+                    
+                }
+    
+                for (let i of splitMarkers) {
+                    let marker = null;
+                    if (i.people.length == 1) {
+                        marker = new L.circleMarker(
+                            mapManager.map.containerPointToLatLng(i.coords),
+                            {
+                                color: "blue",
+                                radius: i.radius,
+                                stroke: false,
+                                fillOpacity: 0.7
+                            }
+                        )
+                        marker.bindPopup(`<p>${i.people[0].name}</p>`);
 
-                    marker.on("mouseout", () => {
-                        // console.log("wat")
-                        marker.setStyle({fillColor: "#FF5710"});
-                        // let tooltipPos = marker.getLatLng();
-                        // tooltipPos.lat += (marker.getRadius() * 0.00001);
-                        // console.log(latlng.lat);                    
-                        // marker.openPopup(tooltipPos);
-                    })
+                    } else {
+                        marker = new L.circleMarker(
+                            mapManager.map.containerPointToLatLng(i.coords),
+                            {
+                                color: "#FF5710",
+                                radius: i.radius,
+                                stroke: false,
+                                fillOpacity: 0.9
+                            }
+                        )
+                        marker.bindPopup(`<p>${i.people.length}</p>`);
+
+                    }
                     this.markerDOMEles.push(marker);
                     marker.addTo(mapManager.map);
                 }
+                //     marker.on("click", (e) => {
+                //         console.log("click")
+                //         console.log(marker.getRadius());
+                //         console.log(i.people);
+                //         controller.setSelectedMarkerData(i);
+                //     })
+                //     // i.markerRef = marker;
+                //     marker.on("mouseover", () => {
+                //         // console.log("wat")
+                //         marker.setStyle({fillColor: "#45CAFF"});
+                //         // let tooltipPos = marker.getLatLng();
+                //         // tooltipPos.lat += (marker.getRadius() * 0.00001);
+                //         // console.log(latlng.lat);                    
+                //         // marker.openPopup(tooltipPos);
+                //     })
+
+                //     marker.on("mouseout", () => {
+                //         // console.log("wat")
+                //         marker.setStyle({fillColor: "#FF5710"});
+                //         // let tooltipPos = marker.getLatLng();
+                //         // tooltipPos.lat += (marker.getRadius() * 0.00001);
+                //         // console.log(latlng.lat);                    
+                //         // marker.openPopup(tooltipPos);
+                //     })
+                    
+                    
+                //     this.markerDOMEles.push(marker);
+                //     marker.addTo(mapManager.map);
+                // }
 
             } else {
                 const markers = [];
@@ -381,6 +521,7 @@ import { markerMergeV1, markerMergeV2} from "./markerMerge.js";
                 })
                 
             })
+            console.log(uniqueCoords);
             return uniqueCoords;
         },
 
