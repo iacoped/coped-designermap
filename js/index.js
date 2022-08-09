@@ -1,10 +1,10 @@
 // Protip: https://stackoverflow.com/questions/23429203/weird-behavior-with-objects-console-log
 // import {csv} from "https://cdn.skypack.dev/d3-fetch@3"; // import just d3's csv capabilities without loading entire library
 
-import { markerMergeV1, markerMergeV2, markerMergeV3, markerMergeV4, markerMergeV5, markerMergeV6 } from "./markerMerge.js";
+import { markerMergeV1, markerMergeV2, markerMergeV3, markerMergeV4, markerMergeV5, markerMergeV6, markerMergeV7 } from "./markerMerge.js";
 import { getRandCoordsWithinCircle } from "./geometry/getRandCoordsWithinCircle.js";
 import { getDistanceBetweenTwoPoints } from "./geometry/getDistanceBetweenTwoPoints.js";
-import { twoCirclesOverlap } from "./geometry/twoCirclesOverlap.js";
+// import { twoCirclesOverlap } from "./geometry/getTwoCirclesIntersectionInfo.js";
 (() => {
     'use strict';
     const model = {
@@ -174,7 +174,7 @@ import { twoCirclesOverlap } from "./geometry/twoCirclesOverlap.js";
                     });
                 }
                 const radiusOfMarkerRepresentingOnePerson = 1 + Math.log(mapManager.map.getZoom() * 100);
-                markers = markerMergeV6(markers);
+                markers = markerMergeV7(markers);
                 // console.log(markers);
                 
                 // what's the radius of a marker representing 1 person?

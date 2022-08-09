@@ -1,5 +1,5 @@
 import { getDistanceBetweenTwoPoints } from "./geometry/getDistanceBetweenTwoPoints.js";
-import { twoCirclesOverlap } from "./geometry/twoCirclesOverlap.js";
+import { getTwoCirclesIntersectionInfo } from "./geometry/getTwoCirclesIntersectionInfo.js";
 import { getSlopeGivenTwoPoints } from "./geometry/getSlopeGivenTwoPoints.js";
 import { getPointsOnSameSlope } from "./geometry/getPointsOnSameSlope.js";
 import { getMidpoint } from "./geometry/getMidpoint.js";
@@ -26,7 +26,7 @@ export function markerMergeV1(markers) {
                 const distance = getDistanceBetweenTwoPoints(i.coords, j.coords);
                 const r1 = i.radius;
                 const r2 = j.radius;
-                if (twoCirclesOverlap(r1, r2, distance)) {
+                if (getTwoCirclesIntersectionInfo(r1, r2, distance)) {
                     intersectionsStillExist = true;
                     // decide rules for the new marker groups size and position
                     if (i.radius > j.radius) {
@@ -184,7 +184,7 @@ export function markerMergeV3(markers) {
                 const distance = getDistanceBetweenTwoPoints(i.coords, j.coords);
                 const r1 = i.radius;
                 const r2 = j.radius;
-                if (twoCirclesOverlap(r1, r2, distance) || distance - r1 - r2 < 10) {
+                if (getTwoCirclesIntersectionInfo(r1, r2, distance) || distance - r1 - r2 < 10) {
                     intersectionsStillExist = true;
                     // decide rules for the new marker groups size and position
                     if (i.radius > j.radius) {
@@ -263,7 +263,7 @@ export function markerMergeV4(markers) {
                 const distance = getDistanceBetweenTwoPoints(i.coords, j.coords);
                 const r1 = i.radius;
                 const r2 = j.radius;
-                if (twoCirclesOverlap(r1, r2, distance)) {
+                if (getTwoCirclesIntersectionInfo(r1, r2, distance)) {
                     intersectionsStillExist = true;
                     // decide rules for the new marker groups size and position
                     if (i.radius > j.radius) {
@@ -450,7 +450,7 @@ export function markerMergeV5(markers) {
                 const distance = getDistanceBetweenTwoPoints(i.coords, j.coords);
                 const r1 = i.radius;
                 const r2 = j.radius;
-                if (twoCirclesOverlap(r1, r2, distance)) {
+                if (getTwoCirclesIntersectionInfo(r1, r2, distance)) {
                     intersectionsStillExist = true;
                     // decide rules for the new marker groups size and position
                     if (i.radius > j.radius) {
@@ -598,7 +598,8 @@ export function markerMergeV6(markers) {
                 const distance = getDistanceBetweenTwoPoints(i.coords, j.coords);
                 const r1 = i.radius;
                 const r2 = j.radius;
-                if (twoCirclesOverlap(r1, r2, distance)) {
+                const intersectionInfo = getTwoCirclesIntersectionInfo(r1, r2, distance);
+                if (intersectionInfo.intersects) {
                     intersectionsStillExist = true;
                     // decide rules for the new marker groups size and position
                     let winner, loser;
@@ -626,7 +627,6 @@ export function markerMergeV6(markers) {
                         } else {
                             winner.coords.x += distanceToMoveMergedMarker;
                         }
-
                     } else if (winner.coords.x == loser.coords.x) {
                         if (winner.coords.y > loser.coords.y) {
                             winner.coords.y -= distanceToMoveMergedMarker;
@@ -647,6 +647,111 @@ export function markerMergeV6(markers) {
                         }
                         winner.radius += 1;
                     }
+                }  
+            }
+        }
+    }
+    // all the markers that are marked inGroup are already part of a group
+    const mergedMarkers = markers.filter(markerGroup => !markerGroup.inGroup);
+    // determine most common region across all people represented by this marker
+    mergedMarkers.forEach((marker) => {
+        const regionCounts = {
+            "fakeRegionForLogic": -Infinity
+        };
+        let mostCommonRegion = "fakeRegionForLogic";
+        for (let i = 0; i < marker.people.length; i++) {
+            const region = marker.people[i].region;
+            if (!(region in regionCounts)) {
+                regionCounts[region] = 1;
+            } else {
+                regionCounts[region]++;
+            }
+            if (regionCounts[region] > regionCounts[mostCommonRegion]) {
+                mostCommonRegion = region;
+            }
+        }
+        marker.mostCommonRegion = mostCommonRegion;
+        // console.log(regionCounts);
+    })
+    return mergedMarkers;
+}
+
+export function markerMergeV7(markers) {
+    // While intersections still exist:
+    //   1. for each marker m1 that is not in a group:
+    //      1. find any markers m2 that are not in a group and m1 != m2, combine them into merged marker (add radius, find midpoint of i and marker)
+    //      2. mark intersecting markers as "merged" already (they should not be considered anymore)
+    //      3. don't mark i as merged (merged marker might end up intersecting with it in future)
+    let intersectionsStillExist = true; 
+    while (intersectionsStillExist) {
+        intersectionsStillExist = false;
+        for (let i of markers) {
+            if (i.inGroup) {
+                continue;
+            }
+            for (let j of markers) {
+                // if they are the same or already in the same group, don't compare it
+                if (i.id === j.id || j.inGroup) {
+                    continue;
+                }
+                // logic for computing intersection
+                const distance = getDistanceBetweenTwoPoints(i.coords, j.coords);
+                const r1 = i.radius;
+                const r2 = j.radius;
+                const intersectionInfo = getTwoCirclesIntersectionInfo(r1, r2, distance);
+                // console.log(intersectionInfo);
+                if (intersectionInfo.intersectsWithoutTouching) {
+                    intersectionsStillExist = true;
+                    // decide rules for the new marker groups size and position
+                    let winner, loser;
+                    if (i.radius >= j.radius) {
+                        winner = i;
+                        loser = j;
+                    } else {
+                        winner = j;
+                        loser = i;
+                    }
+                    winner.members.push(loser.id);
+                    // winner.members = winner.members.concat(loser.members);
+                    winner.people = winner.people.concat(loser.people);
+                    // loser.members = [];
+                    loser.inGroup = true;
+                    
+                    if (!(intersectionInfo.c1ContainsC2 || intersectionInfo.c2ContainsC1)) {
+
+                        const midpoint = getMidpoint(winner.coords, loser.coords);
+                        const distanceToMidpoint = getDistanceBetweenTwoPoints(winner.coords, midpoint);
+                        const distanceToMoveMergedMarker = distanceToMidpoint * (loser.radius / winner.radius);
+
+                        if (winner.coords.x == loser.coords.x && winner.coords.y == loser.coords.y) {
+                            winner.radius += 1;
+                        } else if (winner.coords.y == loser.coords.y) {
+                            if (winner.coords.x > loser.coords.x) {
+                                winner.coords.x -= distanceToMoveMergedMarker;
+                            } else {
+                                winner.coords.x += distanceToMoveMergedMarker;
+                            }
+                        } else if (winner.coords.x == loser.coords.x) {
+                            if (winner.coords.y > loser.coords.y) {
+                                winner.coords.y -= distanceToMoveMergedMarker;
+                            } else {
+                                winner.coords.y += distanceToMoveMergedMarker;
+                            }
+                        } else {
+                            const slope = getSlopeGivenTwoPoints(winner.coords, loser.coords);
+                            const pointsOnSameSlope = getPointsOnSameSlope(winner.coords, distanceToMoveMergedMarker, slope);
+                            if (slope < 0 && winner.coords.x > loser.coords.x) {
+                                winner.coords = pointsOnSameSlope[1];   
+                            } else if (slope < 0 && winner.coords.x < loser.coords.x) {
+                                winner.coords = pointsOnSameSlope[0];
+                            } else if (slope > 0 && winner.coords.x < loser.coords.x) {
+                                winner.coords = pointsOnSameSlope[0];
+                            } else if (slope > 0 && winner.coords.x > loser.coords.x) {
+                                winner.coords = pointsOnSameSlope[1];
+                            }
+                            winner.radius += 1;
+                        }
+                    } 
                 }  
             }
         }
