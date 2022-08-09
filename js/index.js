@@ -5,6 +5,7 @@ import { markerMergeV1, markerMergeV2, markerMergeV3, markerMergeV4, markerMerge
 import { getRandCoordsWithinCircle } from "./geometry/getRandCoordsWithinCircle.js";
 import { getDistanceBetweenTwoPoints } from "./geometry/getDistanceBetweenTwoPoints.js";
 import { getTwoCirclesIntersectionInfo } from "./geometry/getTwoCirclesIntersectionInfo.js";
+import { fetchJson } from "./ajax/fetchJson.js";
 // import { twoCirclesOverlap } from "./geometry/getTwoCirclesIntersectionInfo.js";
 (() => {
     'use strict';
@@ -19,25 +20,30 @@ import { getTwoCirclesIntersectionInfo } from "./geometry/getTwoCirclesIntersect
         async init() {
             this.map = L.map('map', {
                 preferCanvas: true,
+                // worldCopyJump: true,
                 // maxZoom: 15
                 // maxBoundsViscosity: 1.0
             }
             ).setView([37.439974, -15.117188], 1);
             
-            this.map.on("zoom", () => {
-                // console.log("view reset");
+            // firing only on zoomend prevents constant re-rendering when zooming on mobile (plus it looks bad)
+            this.map.on("zoomend", () => {
+                // console.log("zoom");
                 markerManager.renderMarkers();
                 
                 // console.log(this.map.getZoom());
-            })
+            });
+
             // https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}{r}.png
             // https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png
             // https://stamen-tiles-{s}.a.ssl.fastly.net/toner-background/{z}/{x}/{y}{r}.{ext}
             // ^^^ this one has nice black and white scheme as required, but looks like tiles aren't available
             // once you get to zoom level ~3, throws bunch of errors in console.
-            L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/toner-background/{z}/{x}/{y}{r}.png', {
+
+            const blackWhiteMap = L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/toner-background/{z}/{x}/{y}{r}.png', {
                 maxZoom: 12,
                 minZoom: 3,
+                // errorTileUrl: '../assets/images/pexels-photo-376723-909353127.png', // fallback image when tile isn't available is just a white image
                 noWrap: true,
                 // https://stackoverflow.com/questions/47477956/nowrap-option-on-tilelayer-is-only-partially-working
                 bounds: [ // stops leaflet from requesting tiles outside map bounds (causes HTTP 400)
@@ -45,62 +51,52 @@ import { getTwoCirclesIntersectionInfo } from "./geometry/getTwoCirclesIntersect
                     [90, 180]
                 ],
                 attribution: '© OpenStreetMap'
-            }).addTo(this.map);
+            })
+            // fires first
+            .on("loading", () => {
 
-            // const url = "../data/countries.geo.json";
+            })
+            // if it occurs, fires second
+            .on("tileerror", () => {
 
-            const fetchJson = async (url) => {
-                try {
-                    const data = await fetch(url);
-                    const response = await data.json();  
-                    return response;
-                } catch (error) {
-                    console.log(error);
+            })
+            // always fires last
+            .on("load", () => {
+                
+            })
+            .addTo(this.map);
+        
+            // https://gis.stackexchange.com/questions/380874/leaflet-draw-vector-layer-behind-tile-layer
+            // https://leafletjs.com/examples/map-panes/
+            // allows us to display the geoJSON layer behind the tile layer, so if a tile can't be loaded, the geoJSON is shown.
+            this.map.createPane('fallbackPane'); // rename later
+            this.map.getPane('fallbackPane').style.zIndex = 0;
+
+            const landGeoJSON = await fetchJson("../data/countries.geo.json");
+            const countriesLayer = L.geoJson(landGeoJSON, { // initialize layer with data
+                pane: 'fallbackPane',
+                style: {
+                    'weight': 1,
+                    'color': 'black',
+                    'fillColor': 'white',
+                    'fillOpacity': 1
                 }
-            };
+            });
 
-            // const landGeoJSON = await fetchJson("../data/countries.geo.json");
-            // L.geoJson(landGeoJSON, { // initialize layer with data
-            //     style: {
-            //         'weight': 1,
-            //         'color': 'black',
-            //         'fillColor': 'white',
-            //         'fillOpacity': 0.9
-            //     }
-            // }).addTo(this.map); // Add layer to map
+            countriesLayer.addTo(this.map);
 
-            // const waterGeoJSON = await fetchJson("../data/earth-waterbodies.geo.json");
-            // L.geoJson(waterGeoJSON, { // initialize layer with data
-            //     style: {
-            //         'weight': 1,
-            //         'color': 'black',
-            //         'fillColor': 'black',
-            //         'fillOpacity': 1
-            //     }
-            // }).addTo(this.map); // Add layer to map
+            const waterGeoJSON = await fetchJson("../data/earth-waterbodies.geo.json");
+            const bodiesOfWaterLayer = L.geoJson(waterGeoJSON, { // initialize layer with data
+                pane: 'fallbackPane',
+                style: {
+                    'weight': 1,
+                    'color': 'black',
+                    'fillColor': 'black',
+                    'fillOpacity': 1
+                }
+            });
 
-            // fetch('../data/countries.geo.json', function (geojson) { // load file
-            //     console.log("done")
-            //     L.geoJson(geojson, { // initialize layer with data
-            //         style: {
-            //             'weight': 1,
-            //             'color': 'black',
-            //             'fillColor': 'yellow'
-            //         }
-            //     }).addTo(this.map); // Add layer to map
-            // });
-            
-
-            // L.marker([51.5, 50]).addTo(this.map)
-            //     .bindPopup('<img src="DesignBlogImage-1536x1097.jpg" height="200" width="200">', {
-            //     })
-            //     // .openPopup();
-
-            // L.marker([51.5, 60]).addTo(this.map)
-            //     .bindPopup('<img src="DesignBlogImage-1536x1097.jpg">', {
-            //         maxHeight: 300,
-            //         className: "map-popup-1"
-            //     })
+            bodiesOfWaterLayer.addTo(this.map);
 
             let mrker = L.marker([0, -121.74])
                 .addTo(this.map)
@@ -126,9 +122,6 @@ import { getTwoCirclesIntersectionInfo } from "./geometry/getTwoCirclesIntersect
 
                 })
             
-            // console.log(mrker.getContent())
-                // .openPopup();
-
             // sometimes grey area happens, sometimes it doesn't, this hoepfully helps it guaranteed not problem
             // think the problem happens when I change the height of the map via css and live reloads the map
             // this code should prevent this from happening when resizing the map in the css
@@ -143,10 +136,6 @@ import { getTwoCirclesIntersectionInfo } from "./geometry/getTwoCirclesIntersect
         //         .openOn(map);
         // }
         // // 38.579842, -481.48819
-    
-        
-        
-        
     }
 
     const markerManager = {

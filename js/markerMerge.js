@@ -1,7 +1,7 @@
 import { getDistanceBetweenTwoPoints } from "./geometry/getDistanceBetweenTwoPoints.js";
 import { getTwoCirclesIntersectionInfo } from "./geometry/getTwoCirclesIntersectionInfo.js";
 import { getSlopeGivenTwoPoints } from "./geometry/getSlopeGivenTwoPoints.js";
-import { getPointsOnSameSlope } from "./geometry/getPointsOnSameSlope.js";
+import { getPointsOnSameSlope } from "./geometry/getPointsOnSameSlopeAndCertainDistanceAway.js";
 import { getMidpoint } from "./geometry/getMidpoint.js";
 // This module contains multiple variations of the marker merge algorithm.
 export function markerMergeV1(markers) {
