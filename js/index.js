@@ -4,6 +4,7 @@
 import { markerMergeV1, markerMergeV2, markerMergeV3, markerMergeV4, markerMergeV5, markerMergeV6, markerMergeV7 } from "./markerMerge.js";
 import { getRandCoordsWithinCircle } from "./geometry/getRandCoordsWithinCircle.js";
 import { getDistanceBetweenTwoPoints } from "./geometry/getDistanceBetweenTwoPoints.js";
+import { getTwoCirclesIntersectionInfo } from "./geometry/getTwoCirclesIntersectionInfo.js";
 // import { twoCirclesOverlap } from "./geometry/getTwoCirclesIntersectionInfo.js";
 (() => {
     'use strict';
@@ -182,110 +183,110 @@ import { getDistanceBetweenTwoPoints } from "./geometry/getDistanceBetweenTwoPoi
                 // else, for markers who rep N > 1 person, split them into N markers reping 1 person if: 
                 // radius x 2 circle doesn't intersect with any markers?
                 let splitMarkers = [];
-                splitMarkers = markers;
+                // splitMarkers = markers;
                 // console.log(markers[0]);
-                // for (let i of markers) {
-                //     // TODO: add additional rule determining if split occurs or not
-                //     // assign bubbles coordinates such that no bubble overlaps
-                //     let splitAllowed = true;
-                //     const radiusOfCircleForSplitting = (i.radius * 2) + (i.people.length);
-                //     for (let j of markers) {
-                //         if (i.id === j.id) {
-                //             continue;
-                //         }
-                //         const distance = getDistanceBetweenTwoPoints(i.coords, j.coords);
-                //         let r1 = radiusOfCircleForSplitting;
-                //         let r2 = j.radius;
-                //         if (twoCirclesOverlap(r1, r2, distance)) {
-                //             // console.log("no split");
-                //             splitAllowed = false;
-                //         }
-                //     }
-                //     if (i.people.length > 1 && splitAllowed) {
+                for (let i of markers) {
+                    // TODO: add additional rule determining if split occurs or not
+                    // assign bubbles coordinates such that no bubble overlaps
+                    let splitAllowed = true;
+                    const radiusOfCircleForSplitting = (i.radius * 2) + (i.people.length);
+                    for (let j of markers) {
+                        if (i.id === j.id) {
+                            continue;
+                        }
+                        const distance = getDistanceBetweenTwoPoints(i.coords, j.coords);
+                        let r1 = radiusOfCircleForSplitting;
+                        let r2 = j.radius;
+                        const intersectionInfo = getTwoCirclesIntersectionInfo(r1, r2, distance);
+                        if (intersectionInfo.intersects) {
+                            // console.log("no split");
+                            splitAllowed = false;
+                        }
+                    }
+                    if (i.people.length > 1 && splitAllowed) {
                         
-                //         let splitBubbles = [];
-                //         for (let person of i.people) {
+                        let splitBubbles = [];
+                        for (let person of i.people) {
 
-                //             let coordRejected = true;
-                //             let rand = null;
-                //             let tries = 0;
-                //             // coordinate of split bubble cannot result in overlap with another bubble
-                //             while (coordRejected && tries != 1000) {
-                //                 // coord is within a circle that has radius of original merged marker's radius * 2
-                //                 rand = getRandCoordsWithinCircle(i.coords, radiusOfCircleForSplitting, false);
-                //                 coordRejected = false;
-                //                 for (let bubble of splitBubbles) {
-                //                     const distance = getDistanceBetweenTwoPoints(bubble.coords, rand);
-                //                     let r1 = bubble.radius;
-                //                     let r2 = 10;
-                //                     if (distance <= r1 - r2 || distance <= r2 - r1 || distance < r1 + r2 || distance == r1 + r2 || distance < 10) {
-                //                         coordRejected = true;
-                //                     } 
-                //                 }
-                //                 tries++;
-                //                 // console.log(splitBubbles)
-                //             }
-                //             if (tries == 1000 && coordRejected) {
-                //                 console.log(`acceptable position for marker #${splitBubbles.length + 1} could not be found within 1000 attempts for group: `, i)
-                //                 splitAllowed = false;
-                //                 break
-                //             } else {
-                //                 splitBubbles.push({
-                //                     people: [person], 
-                //                     radius: radiusOfMarkerRepresentingOnePerson,
-                //                     coords: {
-                //                         x: rand.x,
-                //                         y: rand.y
-                //                     }
-                //                 });
-                //             }
+                            let coordRejected = true;
+                            let rand = null;
+                            let tries = 0;
+                            // coordinate of split bubble cannot result in overlap with another bubble
+                            while (coordRejected && tries != 1000) {
+                                // coord is within a circle that has radius of original merged marker's radius * 2
+                                rand = getRandCoordsWithinCircle(i.coords, radiusOfCircleForSplitting, false);
+                                coordRejected = false;
+                                for (let bubble of splitBubbles) {
+                                    const distance = getDistanceBetweenTwoPoints(bubble.coords, rand);
+                                    let r1 = bubble.radius;
+                                    let r2 = 10;
+                                    if (distance <= r1 - r2 || distance <= r2 - r1 || distance < r1 + r2 || distance == r1 + r2 || distance < 10) {
+                                        coordRejected = true;
+                                    } 
+                                }
+                                tries++;
+                                // console.log(splitBubbles)
+                            }
+                            if (tries == 1000 && coordRejected) {
+                                console.log(`acceptable position for marker #${splitBubbles.length + 1} could not be found within 1000 attempts for group: `, i)
+                                splitAllowed = false;
+                                break
+                            } else {
+                                splitBubbles.push({
+                                    people: [person], 
+                                    radius: radiusOfMarkerRepresentingOnePerson,
+                                    coords: {
+                                        x: rand.x,
+                                        y: rand.y
+                                    }
+                                });
+                            }
                             
-                //         }
-                //         // if (splitBubbles.length != i.people.length) {
-                //         //     console.log(i, "fail")
-                //         // }
-                //         if (splitAllowed) {
-                //             splitMarkers = splitMarkers.concat(splitBubbles);
-                //             i.split = true;
-                //         } else {
-                //             splitMarkers.push(i);
-                //             i.split = false;
-                //         }
-                //         // splitMarkers.push({
-                //         //     people: [person],
-                //         //     radius: 10,
-                //         //     coords: {
-                //         //         x: i.coords.x + rand.x,
-                //         //         y: i.coords.y + rand.y,
-                //         //     }
-                //         // })
-                //     } else {
-                //         i.split = false;
-                //         splitMarkers.push(i);
-                //     }
-                // }
+                        }
+                        // if (splitBubbles.length != i.people.length) {
+                        //     console.log(i, "fail")
+                        // }
+                        if (splitAllowed) {
+                            splitMarkers = splitMarkers.concat(splitBubbles);
+                            i.split = true;
+                        } else {
+                            splitMarkers.push(i);
+                            i.split = false;
+                        }
+                        // splitMarkers.push({
+                        //     people: [person],
+                        //     radius: 10,
+                        //     coords: {
+                        //         x: i.coords.x + rand.x,
+                        //         y: i.coords.y + rand.y,
+                        //     }
+                        // })
+                    } else {
+                        i.split = false;
+                        splitMarkers.push(i);
+                    }
+                }
                 
                 // console.log(splitMarkers);
 
                 // shows the circle that was used to generate the split markers.
-                for (let i of markers) {
-                    if (i.split) {
-                        console.log("noep")
-                        let marker = new L.circleMarker(
-                            mapManager.map.containerPointToLatLng(i.coords),
-                            {
-                                color: "orange",
-                                radius: (i.radius * 2) + i.people.length,
-                                stroke: false,
-                                fillOpacity: 0.7
-                            }
-                        )
-                        this.markerDOMEles.push(marker);
-                        marker.bindPopup(`<p>${i}</p>`);
-                        marker.addTo(mapManager.map);
-                    }
+                // for (let i of markers) {
+                //     if (i.split) {
+                //         let marker = new L.circleMarker(
+                //             mapManager.map.containerPointToLatLng(i.coords),
+                //             {
+                //                 color: "orange",
+                //                 radius: (i.radius * 2) + i.people.length,
+                //                 stroke: false,
+                //                 fillOpacity: 0.7
+                //             }
+                //         )
+                //         this.markerDOMEles.push(marker);
+                //         marker.bindPopup(`<p>${i}</p>`);
+                //         marker.addTo(mapManager.map);
+                //     }
                     
-                }
+                // }
     
                 for (let i of splitMarkers) {
                     let marker = null;
