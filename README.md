@@ -8,3 +8,5 @@
 - implement RNG with seed so split markers always show up in the same place
 - 2 space indents (JS convention)
 - explain what the marker clustering algorithm is doing in the comments
+- more robust system for fallback map tile providers
+- cite code sources
