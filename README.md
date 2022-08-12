@@ -10,3 +10,4 @@
 - explain what the marker clustering algorithm is doing in the comments
 - more robust system for fallback map tile providers
 - cite code sources
+- keep commits smaller
