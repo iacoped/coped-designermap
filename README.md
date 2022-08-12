@@ -11,3 +11,4 @@
 - more robust system for fallback map tile providers
 - cite code sources
 - keep commits smaller
+- test on various devices

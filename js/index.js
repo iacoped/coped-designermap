@@ -14,6 +14,7 @@ import {
 import { fetchJson } from "./ajax/fetchJson.js";
 import { markerSplitV1, markerSplitV2, markerSplitV3 } from "./markerSplit.js";
 import { getDistanceBetweenTwoPoints } from "./geometry/getDistanceBetweenTwoPoints.js";
+import { getSlopeGivenTwoPoints } from "./geometry/getSlopeGivenTwoPoints.js";
 // import { twoCirclesOverlap } from "./geometry/getTwoCirclesIntersectionInfo.js";
 (() => {
     'use strict';
@@ -25,6 +26,7 @@ import { getDistanceBetweenTwoPoints } from "./geometry/getDistanceBetweenTwoPoi
 
     // perhaps I will combine mapManager and markerManager into mapView since markers are on the mapview
     const mapManager = {
+        currentZoomLevel: null,
         async init() {
             this.map = L.map('map', {
                 preferCanvas: true,
@@ -33,9 +35,9 @@ import { getDistanceBetweenTwoPoints } from "./geometry/getDistanceBetweenTwoPoi
                 // maxZoom: 15
                 // maxBoundsViscosity: 1.0
             }
-            ).setView([37.439974, -15.117188], 1);
+            ).setView([37.439974, -15.117188], 3);
             
- 
+            this.currentZoomLevel = this.map.getZoom();
             // https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}{r}.png
             // https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png
             // https://stamen-tiles-{s}.a.ssl.fastly.net/toner-background/{z}/{x}/{y}{r}.{ext}
@@ -100,49 +102,59 @@ import { getDistanceBetweenTwoPoints } from "./geometry/getDistanceBetweenTwoPoi
 
             bodiesOfWaterLayer.addTo(this.map);
 
-            let mrker = L.marker([0, -121.74])
-                .addTo(this.map)
-                .bindPopup(
-                    `
-                        <img src="./assets/images/DavisAmtrak.PNG" height="200" width="275">
-                        <p>During the Spring Quarter of 2019 my Human-Centered Design class at UC Davis
-                        worked with the city of Davis, CA to reimagine the Amtrak station and the surrounding
-                        areas. I developed the project with Rachel Hartsough, the Arts and Culture Manager
-                        for the City of Davis with the aim of supporting a larger study by the city to explore
-                        ways to improve the station, decrease traffic congestion and encourage biking and
-                        public transportation to and from the station. Utilizing a human-centered approach
-                        to the challenge, the class interviewed potential users, developed a unique frame on
-                        the challenge, then developed concepts, prototyped the ideas, tested them, and then
-                        finally, presented their findings to a group of consultants and city officials at Davis City
-                        Hall.</p>
-                    `, 
+            // let mrker = L.marker([0, -121.74])
+            //     .addTo(this.map)
+            //     .bindPopup(
+            //         `
+            //             <img src="./assets/images/DavisAmtrak.PNG" height="200" width="275">
+            //             <p>During the Spring Quarter of 2019 my Human-Centered Design class at UC Davis
+            //             worked with the city of Davis, CA to reimagine the Amtrak station and the surrounding
+            //             areas. I developed the project with Rachel Hartsough, the Arts and Culture Manager
+            //             for the City of Davis with the aim of supporting a larger study by the city to explore
+            //             ways to improve the station, decrease traffic congestion and encourage biking and
+            //             public transportation to and from the station. Utilizing a human-centered approach
+            //             to the challenge, the class interviewed potential users, developed a unique frame on
+            //             the challenge, then developed concepts, prototyped the ideas, tested them, and then
+            //             finally, presented their findings to a group of consultants and city officials at Davis City
+            //             Hall.</p>
+            //         `, 
                 
                 
-                {
-                    maxHeight: 300,
-                    className: "map-popup-2"
+            //     {
+            //         maxHeight: 300,
+            //         className: "map-popup-2"
 
-                })
+            //     })
             
-                // let marker1 = L.marker([0, -121.74])
-                // .addTo(this.map)
+                let marker1 = L.marker([10, -121.74])
+                .addTo(this.map)
                 
-                // let marker2 = L.marker([0, -130.74])
-                // .addTo(this.map)
+                let marker2 = L.marker([0, -130.74])
+                .addTo(this.map)
 
                 let currDistance = null;
                 // firing only on zoomend prevents constant re-rendering when zooming on mobile (plus it looks bad)
                 // pixel distance between markers changes by factor of 2 on zoom (assuming zoom level changes by 1 each zoom)
                 this.map.on("zoomend", () => {
-                    // console.log("zoom");
-                    markerManager.renderMarkers();
-                    // let newDistance = getDistanceBetweenTwoPoints(this.map.latLngToContainerPoint(marker1.getLatLng()), this.map.latLngToContainerPoint(marker2.getLatLng()));
-                    // console.log(currDistance, newDistance);
+                    let newZoomLevel = this.map.getZoom();
+                    let predictedDistance;
+                    // find a formula that works for all zoomSnap levels later
+                    if (newZoomLevel >= this.currentZoomLevel) {
+                        predictedDistance = currDistance * 2;
+                    } else {
+                        predictedDistance = currDistance / 2;
+                    }
+                    let actualDistance = getDistanceBetweenTwoPoints(this.map.latLngToContainerPoint(marker1.getLatLng()), this.map.latLngToContainerPoint(marker2.getLatLng()));
+                    let slope = getSlopeGivenTwoPoints(this.map.latLngToContainerPoint(marker1.getLatLng()), this.map.latLngToContainerPoint(marker2.getLatLng()));
+                    console.log("actual: ", actualDistance, "predicted: ", predictedDistance);
+                    console.log(slope);
                     // if (currDistance) {
-                    //     console.log(currDistance / newDistance);
+                    //     console.log(currDistance / actualDistance);
                     // }
-                    // currDistance = newDistance;
-                    // console.log(this.map.getZoom());
+                    
+                    currDistance = actualDistance;
+                    this.currentZoomLevel = newZoomLevel;
+                    markerManager.renderMarkers();
                 });
                 
             // sometimes grey area happens, sometimes it doesn't, this hoepfully helps it guaranteed not problem
@@ -151,19 +163,14 @@ import { getDistanceBetweenTwoPoints } from "./geometry/getDistanceBetweenTwoPoi
             //https://stackoverflow.com/questions/19564366/unwanted-gray-area-on-map
             setTimeout(this.map.invalidateSize.bind(this.map));
         }
-    
-        // function onMapClick(e) {
-        //     popup
-        //         .setLatLng(e.latlng)
-        //         .setContent("You clicked the map at " + e.latlng.toString())
-        //         .openOn(map);
-        // }
-        // // 38.579842, -481.48819
     }
 
     const markerManager = {
         markerDOMEles: [],
         markers: [],
+        init() {
+            this.renderMarkers();
+        },
         renderMarkers() {
             const data = controller.getPeopleData();
             if (true) { // maybe can consider not re-rendering if nothing changes
@@ -411,6 +418,7 @@ import { getDistanceBetweenTwoPoints } from "./geometry/getDistanceBetweenTwoPoi
         async init() {
             this.setPeopleData(await this.loadAndProcessDataset());
             mapManager.init();
+            markerManager.init();
             controlPanelView.init();
         },
 
