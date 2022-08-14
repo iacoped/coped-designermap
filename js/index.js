@@ -15,17 +15,20 @@ import { fetchJson } from "./ajax/fetchJson.js";
 import { markerSplitV1, markerSplitV2, markerSplitV3 } from "./markerSplit.js";
 import { getDistanceBetweenTwoPoints } from "./geometry/getDistanceBetweenTwoPoints.js";
 import { getSlopeGivenTwoPoints } from "./geometry/getSlopeGivenTwoPoints.js";
+import { getPointsOnSameSlope } from "./geometry/getPointsOnSameSlopeAndCertainDistanceAway.js";
 // import { twoCirclesOverlap } from "./geometry/getTwoCirclesIntersectionInfo.js";
 (() => {
     'use strict';
     const model = {
         data: null,
         selectedMarkerData: null,
-        markerViewMode: "merge"
+        markerViewMode: "overlap"
     }
 
     // perhaps I will combine mapManager and markerManager into mapView since markers are on the mapview
     const mapManager = {
+        minZoom: 3, 
+        maxZoom: 12,
         currentZoomLevel: null,
         async init() {
             this.map = L.map('map', {
@@ -45,8 +48,8 @@ import { getSlopeGivenTwoPoints } from "./geometry/getSlopeGivenTwoPoints.js";
             // once you get to zoom level ~3, throws bunch of errors in console.
 
             const blackWhiteMap = L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/toner-background/{z}/{x}/{y}{r}.png', {
-                maxZoom: 12,
-                minZoom: 3,
+                maxZoom: this.maxZoom,
+                minZoom: this.minZoom,
                 // errorTileUrl: '../assets/images/pexels-photo-376723-909353127.png', // fallback image when tile isn't available is just a white image
                 noWrap: true,
                 // https://stackoverflow.com/questions/47477956/nowrap-option-on-tilelayer-is-only-partially-working
@@ -146,17 +149,19 @@ import { getSlopeGivenTwoPoints } from "./geometry/getSlopeGivenTwoPoints.js";
                     }
                     let actualDistance = getDistanceBetweenTwoPoints(this.map.latLngToContainerPoint(marker1.getLatLng()), this.map.latLngToContainerPoint(marker2.getLatLng()));
                     let slope = getSlopeGivenTwoPoints(this.map.latLngToContainerPoint(marker1.getLatLng()), this.map.latLngToContainerPoint(marker2.getLatLng()));
-                    console.log("actual: ", actualDistance, "predicted: ", predictedDistance);
-                    console.log(slope);
+
+                    // console.log("actual: ", actualDistance, "predicted: ", predictedDistance);
+                    // console.log(slope);
                     // if (currDistance) {
                     //     console.log(currDistance / actualDistance);
                     // }
                     
                     currDistance = actualDistance;
                     this.currentZoomLevel = newZoomLevel;
-                    markerManager.renderMarkers();
+                    // markerManager.renderMarkers();
+                    // markerManager.renderMarkersUsingPredictions();
                 });
-                
+            // 2 ** zoomLevel
             // sometimes grey area happens, sometimes it doesn't, this hoepfully helps it guaranteed not problem
             // think the problem happens when I change the height of the map via css and live reloads the map
             // this code should prevent this from happening when resizing the map in the css
@@ -168,8 +173,190 @@ import { getSlopeGivenTwoPoints } from "./geometry/getSlopeGivenTwoPoints.js";
     const markerManager = {
         markerDOMEles: [],
         markers: [],
+        markersToRenderAtEachZoomLevel: {},
+        referencePoint: {
+            posInLatLng: new L.LatLng(100, -40),
+            posInPxCoordsAtStartUp: null
+        },
         init() {
-            this.renderMarkers();
+            // this.renderMarkers();
+            this.predictMarkerLocations();
+            this.renderMarkersUsingPredictions();
+        },
+        renderMarkersUsingPredictions() {
+            if (true) { // maybe can consider not re-rendering if nothing changes
+                for (let i = 0; i < this.markerDOMEles.length; i++) {
+                    this.markerDOMEles[i].removeFrom(mapManager.map);
+                }
+                this.markerDOMEles = [];
+            }
+            const currentZoomLevel = mapManager.map.getZoom();
+            // the location of the reference point relative to the container will be different from its position on startup.
+            // so need to offset all the markers by some amount to place them in the correct location.
+            const refPointInPxCoords = mapManager.map.latLngToContainerPoint(this.referencePoint.posInLatLng);
+            console.log(refPointInPxCoords, this.referencePoint.posInPxCoordsAtStartUp);
+            const xShiftAmount = refPointInPxCoords.x - this.referencePoint.posInPxCoordsAtStartUp.x;
+            const yShiftAmount = refPointInPxCoords.y - this.referencePoint.posInPxCoordsAtStartUp.y;
+            
+            for (let i of this.markersToRenderAtEachZoomLevel[currentZoomLevel]) {
+                const newPxCoords = {
+                    x: i.markerCoordsInPx.x + xShiftAmount,
+                    y: i.markerCoordsInPx.y + yShiftAmount
+                }
+                let marker = new L.circleMarker(
+                    mapManager.map.containerPointToLatLng(newPxCoords),
+                        {
+                            color: "orange",
+                            radius: i.radius,
+                            stroke: false,
+                            fillOpacity: 0.7
+                        }
+                    )
+                    this.markerDOMEles.push(marker);
+                    // marker.bindPopup(`<p>${i.people.length}</p>`);
+                    marker.addTo(mapManager.map);
+            }
+        },
+        // predicts the location, in pixel coordinates, of the markers at each zoom level.
+        // somewhat inaccurate b/c some latlngs are close enough that px coordinates are the same, 
+        // so predictions become inaccurate since they rely solely on rendering based on pixel coordinates.
+        predictMarkerLocations() {
+            // distance in px between this and all markers computed
+            const data = controller.getPeopleData();
+            let refPointInPxCoords = mapManager.map.latLngToContainerPoint(this.referencePoint.posInLatLng);
+            this.referencePoint.posInPxCoordsAtStartUp = refPointInPxCoords;
+
+            const uniqueCoordsKeys = Object.keys(data);
+
+            for (let i = mapManager.minZoom; i <= mapManager.maxZoom; i++) {
+                this.markersToRenderAtEachZoomLevel[i] = []
+            }
+            console.log(this.markersToRenderAtEachZoomLevel);
+            // what info is needed for the prediction? 
+            let referenceInfo = [];
+            for (let i = 0; i < uniqueCoordsKeys.length; i++) {
+                let markerCoordsInPx = mapManager.map.latLngToContainerPoint([data[uniqueCoordsKeys[i]].lat, data[uniqueCoordsKeys[i]].lng]);
+
+                const distance = getDistanceBetweenTwoPoints(refPointInPxCoords, markerCoordsInPx);
+                let slope = undefined; 
+                let directionToPlaceMarkerRelativeToReferencePoint;
+                if (refPointInPxCoords.x == markerCoordsInPx.x && refPointInPxCoords.y == markerCoordsInPx.y) {
+                    directionToPlaceMarkerRelativeToReferencePoint = "none";
+                } else if (refPointInPxCoords.y == markerCoordsInPx.y) {
+                    if (refPointInPxCoords.x > markerCoordsInPx.coords.x) {
+                        directionToPlaceMarkerRelativeToReferencePoint = "to its left";
+                    } else {
+                        directionToPlaceMarkerRelativeToReferencePoint = "to its right";
+                    }
+                } else if (refPointInPxCoords.x == markerCoordsInPx.x) {
+                    if (refPointInPxCoords.y > markerCoordsInPx.y) {
+                        // winner.coords.y -= distanceToMoveMergedMarker;
+                        directionToPlaceMarkerRelativeToReferencePoint = "above it";
+                    } else {
+                        // winner.coords.y += distanceToMoveMergedMarker;
+                        directionToPlaceMarkerRelativeToReferencePoint = "below it";
+                    }
+                } else {
+                    slope = getSlopeGivenTwoPoints(refPointInPxCoords, markerCoordsInPx);
+                    // const pointsOnSameSlope = getPointsOnSameSlope(markerCoordsInPx, distance, slope);
+                    if (slope < 0 && refPointInPxCoords.x > markerCoordsInPx.x) {
+                        // winner.coords = pointsOnSameSlope[1];   
+                        directionToPlaceMarkerRelativeToReferencePoint = "its upper left";
+                    } else if (slope < 0 && refPointInPxCoords.x < markerCoordsInPx.x) {
+                        directionToPlaceMarkerRelativeToReferencePoint = "its bottom right";
+                        // winner.coords = pointsOnSameSlope[0];
+                    } else if (slope > 0 && refPointInPxCoords.x < markerCoordsInPx.x) {
+                        directionToPlaceMarkerRelativeToReferencePoint = "its upper right";
+                        // winner.coords = pointsOnSameSlope[0];
+                    } else if (slope > 0 && refPointInPxCoords.x > markerCoordsInPx.x) {
+                        directionToPlaceMarkerRelativeToReferencePoint = "its bottom left";
+                        // winner.coords = pointsOnSameSlope[1];
+                    }
+                    // winner.radius += 1;
+                }
+                referenceInfo.push({
+                    distance: distance,
+                    slope: slope,
+                    directionToPlaceMarkerRelativeToReferencePoint: directionToPlaceMarkerRelativeToReferencePoint,
+                    
+                })
+                
+            }   
+
+            console.log(referenceInfo);
+            // do the predictions
+            let factor = 0;
+            for (let zoomLevel = mapManager.minZoom; zoomLevel <= mapManager.maxZoom; zoomLevel++) {
+                for (let j = 0; j < referenceInfo.length; j++) {
+                    // px distance between markers should always increase as you zoom in
+                    let newDistance = referenceInfo[j].distance * (Math.pow(2, factor));
+                    let markerCoordsInPx;
+                    if (referenceInfo[j].slope) {
+                        const points = getPointsOnSameSlope(refPointInPxCoords, newDistance, referenceInfo[j].slope);
+                        switch (referenceInfo[j].directionToPlaceMarkerRelativeToReferencePoint) {
+                            case ("its upper left"):
+                                markerCoordsInPx = points[1];
+                                break;
+                            case ("its bottom right"):
+                                markerCoordsInPx = points[0];
+                                break;
+                            case ("its upper right"):
+                                markerCoordsInPx = points[0];
+                                break;
+                            case ("its bottom left"):
+                                markerCoordsInPx = points[1];
+                                break;
+                        }
+                    } else {
+                        switch (referenceInfo[j].directionToPlaceMarkerRelativeToReferencePoint) {
+                            case ("none"): // marker is right on top of refPoint (very unlikely)
+                                markerCoordsInPx = JSON.parse(JSON.stringify(refPointInPxCoords));
+                                break;
+                            case ("to its left"):
+                                markerCoordsInPx = {
+                                    x: refPointInPxCoords.x - newDistance,
+                                    y: refPointInPxCoords.y
+                                }
+                                break;
+                            case ("to its right"):
+                                markerCoordsInPx = {
+                                    x: refPointInPxCoords.x + newDistance,
+                                    y: refPointInPxCoords.y
+                                }
+                                break;
+                            case ("above it"):
+                                markerCoordsInPx = {
+                                    x: refPointInPxCoords.x,
+                                    y: refPointInPxCoords.y + newDistance
+                                }
+                                break;
+                            case ("below it"):
+                                markerCoordsInPx = {
+                                    x: refPointInPxCoords.x,
+                                    y: refPointInPxCoords.y - newDistance
+                                }
+                                break;
+                        }
+                    }
+                    this.markersToRenderAtEachZoomLevel[zoomLevel].push({
+                        markerCoordsInPx: markerCoordsInPx,
+                        radius: data[uniqueCoordsKeys[j]].people.length + Math.log(zoomLevel * 100),
+                    })
+                }   
+                factor++;
+                
+            }
+            console.log(JSON.parse(JSON.stringify(this.markersToRenderAtEachZoomLevel)));
+            // for (let i = 0; i < uniqueCoordsKeys.length; i++) {
+            //     newMarkers.push({
+            //         id: `group-${i}`,
+            //         coords: mapManager.map.latLngToContainerPoint([data[uniqueCoordsKeys[i]].lat, data[uniqueCoordsKeys[i]].lng]),
+            //         radius: data[uniqueCoordsKeys[i]].people.length + Math.log(mapManager.map.getZoom() * 100), // data[uniqueCoordsKeys[i]].people.length > 5 ? data[uniqueCoordsKeys[i]].people.length + mapManager.map.getZoom() * 0.5 : data[uniqueCoordsKeys[i]].people.length + 2 + mapManager.map.getZoom(),
+            //         people: data[uniqueCoordsKeys[i]].people,
+            //         members: [uniqueCoordsKeys[i]],
+            //         inGroup: false
+            //     });
+            // }
         },
         renderMarkers() {
             const data = controller.getPeopleData();
@@ -182,6 +369,8 @@ import { getSlopeGivenTwoPoints } from "./geometry/getSlopeGivenTwoPoints.js";
             const renderMode = controller.getMarkerViewMode();
             const uniqueCoordsKeys = Object.keys(data);
             if (renderMode === "merge") {
+                this.renderMarkersUsingPredictions();
+                return;
                 let newMarkers = [];
                 for (let i = 0; i < uniqueCoordsKeys.length; i++) {
                     newMarkers.push({
@@ -282,7 +471,7 @@ import { getSlopeGivenTwoPoints } from "./geometry/getSlopeGivenTwoPoints.js";
                     markers.push({
                         id: uniqueCoordsKeys[i],
                         latlng: [data[uniqueCoordsKeys[i]].lat, data[uniqueCoordsKeys[i]].lng],
-                        radius: data[uniqueCoordsKeys[i]].people.length + mapManager.map.getZoom(),
+                        radius: data[uniqueCoordsKeys[i]].people.length + Math.log(mapManager.map.getZoom() * 100),
                         people: data[uniqueCoordsKeys[i]].people,
                     });
                 }
@@ -312,7 +501,7 @@ import { getSlopeGivenTwoPoints } from "./geometry/getSlopeGivenTwoPoints.js";
                         markers[i].latlng,
                         {
                             color: "#FF5710",
-                            radius: markers[i].people.length + mapManager.map.getZoom(),
+                            radius: markers[i].radius,
                             stroke: false,
                             fillOpacity: 0.5
                         }
