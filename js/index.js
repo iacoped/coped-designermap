@@ -139,26 +139,26 @@ import { getPointsOnSameSlope } from "./geometry/getPointsOnSameSlopeAndCertainD
                 // firing only on zoomend prevents constant re-rendering when zooming on mobile (plus it looks bad)
                 // pixel distance between markers changes by factor of 2 on zoom (assuming zoom level changes by 1 each zoom)
                 this.map.on("zoomend", () => {
-                    let newZoomLevel = this.map.getZoom();
-                    let predictedDistance;
-                    // find a formula that works for all zoomSnap levels later
-                    if (newZoomLevel >= this.currentZoomLevel) {
-                        predictedDistance = currDistance * 2;
-                    } else {
-                        predictedDistance = currDistance / 2;
-                    }
-                    let actualDistance = getDistanceBetweenTwoPoints(this.map.latLngToContainerPoint(marker1.getLatLng()), this.map.latLngToContainerPoint(marker2.getLatLng()));
-                    let slope = getSlopeGivenTwoPoints(this.map.latLngToContainerPoint(marker1.getLatLng()), this.map.latLngToContainerPoint(marker2.getLatLng()));
-
-                    // console.log("actual: ", actualDistance, "predicted: ", predictedDistance);
-                    // console.log(slope);
-                    // if (currDistance) {
-                    //     console.log(currDistance / actualDistance);
+                    // let newZoomLevel = this.map.getZoom();
+                    // let predictedDistance;
+                    // // find a formula that works for all zoomSnap levels later
+                    // if (newZoomLevel >= this.currentZoomLevel) {
+                    //     predictedDistance = currDistance * 2;
+                    // } else {
+                    //     predictedDistance = currDistance / 2;
                     // }
+                    // let actualDistance = getDistanceBetweenTwoPoints(this.map.latLngToContainerPoint(marker1.getLatLng()), this.map.latLngToContainerPoint(marker2.getLatLng()));
+                    // let slope = getSlopeGivenTwoPoints(this.map.latLngToContainerPoint(marker1.getLatLng()), this.map.latLngToContainerPoint(marker2.getLatLng()));
+
+                    // // console.log("actual: ", actualDistance, "predicted: ", predictedDistance);
+                    // // console.log(slope);
+                    // // if (currDistance) {
+                    // //     console.log(currDistance / actualDistance);
+                    // // }
                     
-                    currDistance = actualDistance;
-                    this.currentZoomLevel = newZoomLevel;
-                    // markerManager.renderMarkers();
+                    // currDistance = actualDistance;
+                    // this.currentZoomLevel = newZoomLevel;
+                    markerManager.renderMarkers();
                     // markerManager.renderMarkersUsingPredictions();
                 });
             // 2 ** zoomLevel
@@ -181,7 +181,8 @@ import { getPointsOnSameSlope } from "./geometry/getPointsOnSameSlopeAndCertainD
         init() {
             // this.renderMarkers();
             this.predictMarkerLocations();
-            this.renderMarkersUsingPredictions();
+            this.renderMarkers();
+            // this.renderMarkersUsingPredictions();
         },
         renderMarkersUsingPredictions() {
             if (true) { // maybe can consider not re-rendering if nothing changes
