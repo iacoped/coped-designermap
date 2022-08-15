@@ -184,6 +184,90 @@ import { getPointsOnSameSlope } from "./geometry/getPointsOnSameSlopeAndCertainD
             this.renderMarkers();
             // this.renderMarkersUsingPredictions();
         },
+
+        // offset is only used with prediction method.
+        actuallyRenderMarkersOnMap(markers, coordinateType, markerComputationMethod, offset) {
+            for (let i of markers) {
+                let markerCoords = JSON.parse(JSON.stringify(i.coords))
+                if (markerComputationMethod === "prediction" && offset != null) {
+                    markerCoords.x += offset.xShiftAmount;
+                    markerCoords.y += offset.yShiftAmount;
+                }
+                if (!i.inGroup) {
+                    if (i.people.length == 1) {
+                        let marker = new L.circleMarker(
+                            coordinateType === "latlng" ? markerCoords : mapManager.map.containerPointToLatLng(markerCoords),
+                            {
+                                color: "blue",
+                                radius: i.radius,
+                                stroke: false,
+                                fillOpacity: 0.9
+                            }
+                        )
+                        marker.bindPopup(`<p>${i.people[0].name}</p>`);
+                        this.markerDOMEles.push(marker);
+                        marker.addTo(mapManager.map);
+                    } else {
+                        if (i.split) {
+                            // shows the circle that was used to generate the split markers.
+                            if (true) {
+                                let marker = new L.circleMarker(
+                                    coordinateType === "latlng" ? markerCoords : mapManager.map.containerPointToLatLng(markerCoords),
+                                    {
+                                        color: "orange",
+                                        radius: (i.radius * 2) + i.people.length,
+                                        stroke: false,
+                                        fillOpacity: 0.7
+                                    }
+                                )
+                                this.markerDOMEles.push(marker);
+                                marker.bindPopup(`<p>${i.people.length}</p>`);
+                                marker.addTo(mapManager.map);
+                            }
+                            
+                            for (let subBubble of i.splitBubbles) {
+                                let subBubbleCoords = JSON.parse(JSON.stringify(subBubble.coords))
+                                if (markerComputationMethod === "prediction") {
+                                    subBubbleCoords.coords.x += offset.xShiftAmount;
+                                    subBubbleCoords.coords.y += offset.yShiftAmount;
+                                }
+                                let marker = new L.circleMarker(
+                                    coordinateType === "latlng" ? subBubbleCoords : mapManager.map.containerPointToLatLng(subBubbleCoords),
+                                    {
+                                        color: "blue",
+                                        radius: subBubble.radius,
+                                        stroke: false,
+                                        fillOpacity: 0.9
+                                    }
+                                )
+                                marker.bindPopup(`<p>${subBubble.name}</p>`);
+                                this.markerDOMEles.push(marker);
+                                marker.addTo(mapManager.map);
+                            }
+                            
+                        } else {
+                            let marker = new L.circleMarker(
+                                coordinateType === "latlng" ? markerCoords : mapManager.map.containerPointToLatLng(markerCoords),
+                                {
+                                    color: "#FF5710",
+                                    radius: i.radius,
+                                    stroke: false,
+                                    fillOpacity: 0.9
+                                }
+                            )
+
+                            marker.bindPopup(`<p>${i.people.length}</p>`);
+                            marker.on("click", (e) => {
+
+                            })
+                            this.markerDOMEles.push(marker);
+                            marker.addTo(mapManager.map);
+                        }
+                    }
+                }
+            }
+        },
+
         renderMarkersUsingPredictions() {
             if (true) { // maybe can consider not re-rendering if nothing changes
                 for (let i = 0; i < this.markerDOMEles.length; i++) {
@@ -195,28 +279,13 @@ import { getPointsOnSameSlope } from "./geometry/getPointsOnSameSlopeAndCertainD
             // the location of the reference point relative to the container will be different from its position on startup.
             // so need to offset all the markers by some amount to place them in the correct location.
             const refPointInPxCoords = mapManager.map.latLngToContainerPoint(this.referencePoint.posInLatLng);
-            console.log(refPointInPxCoords, this.referencePoint.posInPxCoordsAtStartUp);
-            const xShiftAmount = refPointInPxCoords.x - this.referencePoint.posInPxCoordsAtStartUp.x;
-            const yShiftAmount = refPointInPxCoords.y - this.referencePoint.posInPxCoordsAtStartUp.y;
-            
-            for (let i of this.markersToRenderAtEachZoomLevel[currentZoomLevel]) {
-                const newPxCoords = {
-                    x: i.markerCoordsInPx.x + xShiftAmount,
-                    y: i.markerCoordsInPx.y + yShiftAmount
-                }
-                let marker = new L.circleMarker(
-                    mapManager.map.containerPointToLatLng(newPxCoords),
-                        {
-                            color: "orange",
-                            radius: i.radius,
-                            stroke: false,
-                            fillOpacity: 0.7
-                        }
-                    )
-                    this.markerDOMEles.push(marker);
-                    // marker.bindPopup(`<p>${i.people.length}</p>`);
-                    marker.addTo(mapManager.map);
+
+            const offset = {
+                xShiftAmount: refPointInPxCoords.x - this.referencePoint.posInPxCoordsAtStartUp.x,
+                yShiftAmount: refPointInPxCoords.y - this.referencePoint.posInPxCoordsAtStartUp.y
             }
+
+            this.actuallyRenderMarkersOnMap(this.markersToRenderAtEachZoomLevel[currentZoomLevel], "px", "prediction", offset);
         },
         // predicts the location, in pixel coordinates, of the markers at each zoom level.
         // somewhat inaccurate b/c some latlngs are close enough that px coordinates are the same, 
@@ -340,24 +409,21 @@ import { getPointsOnSameSlope } from "./geometry/getPointsOnSameSlopeAndCertainD
                         }
                     }
                     this.markersToRenderAtEachZoomLevel[zoomLevel].push({
-                        markerCoordsInPx: markerCoordsInPx,
+                        id: `group-${j}`,
+                        coords: markerCoordsInPx,
                         radius: data[uniqueCoordsKeys[j]].people.length + Math.log(zoomLevel * 100),
-                    })
+                        people: data[uniqueCoordsKeys[j]].people,
+                        members: [uniqueCoordsKeys[j]],
+                        inGroup: false
+                    });
                 }   
+                // merge markers
+                this.markersToRenderAtEachZoomLevel[zoomLevel] = markerMergeV8(this.markersToRenderAtEachZoomLevel[zoomLevel]);
+                
                 factor++;
                 
             }
             console.log(JSON.parse(JSON.stringify(this.markersToRenderAtEachZoomLevel)));
-            // for (let i = 0; i < uniqueCoordsKeys.length; i++) {
-            //     newMarkers.push({
-            //         id: `group-${i}`,
-            //         coords: mapManager.map.latLngToContainerPoint([data[uniqueCoordsKeys[i]].lat, data[uniqueCoordsKeys[i]].lng]),
-            //         radius: data[uniqueCoordsKeys[i]].people.length + Math.log(mapManager.map.getZoom() * 100), // data[uniqueCoordsKeys[i]].people.length > 5 ? data[uniqueCoordsKeys[i]].people.length + mapManager.map.getZoom() * 0.5 : data[uniqueCoordsKeys[i]].people.length + 2 + mapManager.map.getZoom(),
-            //         people: data[uniqueCoordsKeys[i]].people,
-            //         members: [uniqueCoordsKeys[i]],
-            //         inGroup: false
-            //     });
-            // }
         },
         renderMarkers() {
             const data = controller.getPeopleData();
@@ -388,92 +454,18 @@ import { getPointsOnSameSlope } from "./geometry/getPointsOnSameSlopeAndCertainD
 
                 newMarkers = markerSplitV3(newMarkers, 1 + Math.log(mapManager.map.getZoom() * 100));
 
-                for (let i of newMarkers) {
-                    if (!i.inGroup) {
-                        if (i.people.length == 1) {
-                            let marker = new L.circleMarker(
-                                mapManager.map.containerPointToLatLng(i.coords),
-                                {
-                                    color: "blue",
-                                    radius: i.radius,
-                                    stroke: false,
-                                    fillOpacity: 0.9
-                                }
-                            )
-                            marker.bindPopup(`<p>${i.people[0].name}</p>`);
-                            this.markerDOMEles.push(marker);
-                            marker.addTo(mapManager.map);
-                        } else {
-                            if (i.split) {
-                                // shows the circle that was used to generate the split markers.
-                                if (true) {
-                                    let marker = new L.circleMarker(
-                                    mapManager.map.containerPointToLatLng(i.coords),
-                                        {
-                                            color: "orange",
-                                            radius: (i.radius * 2) + i.people.length,
-                                            stroke: false,
-                                            fillOpacity: 0.7
-                                        }
-                                    )
-                                    this.markerDOMEles.push(marker);
-                                    marker.bindPopup(`<p>${i.people.length}</p>`);
-                                    marker.addTo(mapManager.map);
-                                }
-                                
-                                for (let subBubble of i.splitBubbles) {
-                                    let marker = new L.circleMarker(
-                                        mapManager.map.containerPointToLatLng(subBubble.coords),
-                                        {
-                                            color: "blue",
-                                            radius: subBubble.radius,
-                                            stroke: false,
-                                            fillOpacity: 0.9
-                                        }
-                                    )
-                                    marker.bindPopup(`<p>${subBubble.name}</p>`);
-                                    this.markerDOMEles.push(marker);
-                                    marker.addTo(mapManager.map);
-                                }
-                                
-                            } else {
-                                let marker = new L.circleMarker(
-                                    mapManager.map.containerPointToLatLng(i.coords),
-                                    {
-                                        color: "#FF5710",
-                                        radius: i.radius,
-                                        stroke: false,
-                                        fillOpacity: 0.9
-                                    }
-                                )
-
-                                marker.bindPopup(`<p>${i.people.length}</p>`);
-                                marker.on("click", (e) => {
-
-                                    // some testing for centering on marker when clicked
-                                    // let zoom = 4;
-                                    // while (zoom <= 8) {
-                                    //     console.log("wtf")
-                                    //     mapManager.map.setView(e.target.getLatLng(), zoom++);
-                                    //     // mapManager.map.setZoom();
-                                    // }
-                                    // mapManager.map.setView(e.target.getLatLng());
-                                })
-                                this.markerDOMEles.push(marker);
-                                marker.addTo(mapManager.map);
-                            }
-                        }
-                    }
-                }
+                this.actuallyRenderMarkersOnMap(newMarkers, "px", "realtime", null);
 
             } else {
                 const markers = [];
                 for (let i = 0; i < uniqueCoordsKeys.length; i++) {
                     markers.push({
-                        id: uniqueCoordsKeys[i],
-                        latlng: [data[uniqueCoordsKeys[i]].lat, data[uniqueCoordsKeys[i]].lng],
+                        id: `group-${i}`,
+                        coords: [data[uniqueCoordsKeys[i]].lat, data[uniqueCoordsKeys[i]].lng],
                         radius: data[uniqueCoordsKeys[i]].people.length + Math.log(mapManager.map.getZoom() * 100),
                         people: data[uniqueCoordsKeys[i]].people,
+                        members: [uniqueCoordsKeys[i]],
+                        inGroup: false
                     });
                 }
 
@@ -496,53 +488,7 @@ import { getPointsOnSameSlope } from "./geometry/getPointsOnSameSlopeAndCertainD
                     marker.mostCommonRegion = mostCommonRegion;
                 })
 
-                for (let i = 0; i < markers.length; i++) {
-                    // console.log(mapManager.map.latLngToContainerPoint([uniqueCoords[uniqueCoordsKeys[i]].lat, uniqueCoords[uniqueCoordsKeys[i]].lng]));
-                    let marker = new L.circleMarker(
-                        markers[i].latlng,
-                        {
-                            color: "#FF5710",
-                            radius: markers[i].radius,
-                            stroke: false,
-                            fillOpacity: 0.5
-                        }
-                    )
-                    this.markerDOMEles.push(marker);
-
-                    
-                    // marker.on("add", () => {
-                    //     console.log("added to map")
-                    // })
-
-                    marker.on("click", (e) => {
-                        // if (marker.isPopupOpen()) {
-                        //     marker.closePopup();
-                        // }
-                        controller.setSelectedMarkerData(markers[i]);
-                    })
-
-                    marker.on("mouseover", () => {
-                        // console.log("wat")
-                        marker.setStyle({fillColor: "#45CAFF"});
-                        let tooltipPos = marker.getLatLng();
-                        // tooltipPos.lat += (marker.getRadius() * 0.00001);
-                        // console.log(latlng.lat);                    
-                        // marker.openPopup(tooltipPos);
-                    })
-
-                    marker.on("mouseout", () => {
-                        // console.log("wat")
-                        marker.setStyle({fillColor: "#FF5710"});
-                        let tooltipPos = marker.getLatLng();
-                        // tooltipPos.lat += (marker.getRadius() * 0.00001);
-                        // console.log(latlng.lat);                    
-                        // marker.openPopup(tooltipPos);
-                    })
-
-                    marker.addTo(mapManager.map);
-                }
-
-                
+                this.actuallyRenderMarkersOnMap(markers, "latlng", "realtime", null);
             }
         }
     }
