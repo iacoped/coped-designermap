@@ -22,7 +22,7 @@ import { getPointsOnSameSlope } from "./geometry/getPointsOnSameSlopeAndCertainD
     const model = {
         data: null,
         selectedMarkerData: null,
-        markerViewMode: "overlap"
+        markerViewMode: "overlap-real-time"
     }
 
     // perhaps I will combine mapManager and markerManager into mapView since markers are on the mapview
@@ -129,38 +129,18 @@ import { getPointsOnSameSlope } from "./geometry/getPointsOnSameSlopeAndCertainD
 
             //     })
             
-                let marker1 = L.marker([10, -121.74])
-                .addTo(this.map)
+                // let marker1 = L.marker([10, -121.74])
+                // .addTo(this.map)
                 
-                let marker2 = L.marker([0, -130.74])
-                .addTo(this.map)
+                // let marker2 = L.marker([0, -130.74])
+                // .addTo(this.map)
 
-                let currDistance = null;
-                // firing only on zoomend prevents constant re-rendering when zooming on mobile (plus it looks bad)
-                // pixel distance between markers changes by factor of 2 on zoom (assuming zoom level changes by 1 each zoom)
-                this.map.on("zoomend", () => {
-                    // let newZoomLevel = this.map.getZoom();
-                    // let predictedDistance;
-                    // // find a formula that works for all zoomSnap levels later
-                    // if (newZoomLevel >= this.currentZoomLevel) {
-                    //     predictedDistance = currDistance * 2;
-                    // } else {
-                    //     predictedDistance = currDistance / 2;
-                    // }
-                    // let actualDistance = getDistanceBetweenTwoPoints(this.map.latLngToContainerPoint(marker1.getLatLng()), this.map.latLngToContainerPoint(marker2.getLatLng()));
-                    // let slope = getSlopeGivenTwoPoints(this.map.latLngToContainerPoint(marker1.getLatLng()), this.map.latLngToContainerPoint(marker2.getLatLng()));
-
-                    // // console.log("actual: ", actualDistance, "predicted: ", predictedDistance);
-                    // // console.log(slope);
-                    // // if (currDistance) {
-                    // //     console.log(currDistance / actualDistance);
-                    // // }
-                    
-                    // currDistance = actualDistance;
-                    // this.currentZoomLevel = newZoomLevel;
-                    markerManager.renderMarkers();
-                    // markerManager.renderMarkersUsingPredictions();
-                });
+            let currDistance = null;
+            // firing only on zoomend prevents constant re-rendering when zooming on mobile (plus it looks bad)
+            // pixel distance between markers changes by factor of 2 on zoom (assuming zoom level changes by 1 each zoom)
+            this.map.on("zoomend", () => {
+                markerManager.renderMarkers();
+            });
             // 2 ** zoomLevel
             // sometimes grey area happens, sometimes it doesn't, this hoepfully helps it guaranteed not problem
             // think the problem happens when I change the height of the map via css and live reloads the map
@@ -201,7 +181,7 @@ import { getPointsOnSameSlope } from "./geometry/getPointsOnSameSlopeAndCertainD
                                 color: "blue",
                                 radius: i.radius,
                                 stroke: false,
-                                fillOpacity: 0.9
+                                fillOpacity: 0.5
                             }
                         )
                         marker.bindPopup(`<p>${i.people[0].name}</p>`);
@@ -214,10 +194,10 @@ import { getPointsOnSameSlope } from "./geometry/getPointsOnSameSlopeAndCertainD
                                 let marker = new L.circleMarker(
                                     coordinateType === "latlng" ? markerCoords : mapManager.map.containerPointToLatLng(markerCoords),
                                     {
-                                        color: "orange",
+                                        color: "#FF5710",
                                         radius: (i.radius * 2) + i.people.length,
                                         stroke: false,
-                                        fillOpacity: 0.7
+                                        fillOpacity: 0.9
                                     }
                                 )
                                 this.markerDOMEles.push(marker);
@@ -237,7 +217,7 @@ import { getPointsOnSameSlope } from "./geometry/getPointsOnSameSlopeAndCertainD
                                         color: "blue",
                                         radius: subBubble.radius,
                                         stroke: false,
-                                        fillOpacity: 0.9
+                                        fillOpacity: 0.5
                                     }
                                 )
                                 marker.bindPopup(`<p>${subBubble.name}</p>`);
@@ -268,7 +248,7 @@ import { getPointsOnSameSlope } from "./geometry/getPointsOnSameSlopeAndCertainD
             }
         },
 
-        renderMarkersUsingPredictions() {
+        renderMarkersUsingPredictions(markerMode) {
             if (true) { // maybe can consider not re-rendering if nothing changes
                 for (let i = 0; i < this.markerDOMEles.length; i++) {
                     this.markerDOMEles[i].removeFrom(mapManager.map);
@@ -284,8 +264,7 @@ import { getPointsOnSameSlope } from "./geometry/getPointsOnSameSlopeAndCertainD
                 xShiftAmount: refPointInPxCoords.x - this.referencePoint.posInPxCoordsAtStartUp.x,
                 yShiftAmount: refPointInPxCoords.y - this.referencePoint.posInPxCoordsAtStartUp.y
             }
-
-            this.actuallyRenderMarkersOnMap(this.markersToRenderAtEachZoomLevel[currentZoomLevel], "px", "prediction", offset);
+            this.actuallyRenderMarkersOnMap(this.markersToRenderAtEachZoomLevel[currentZoomLevel][markerMode], "px", "prediction", offset);
         },
         // predicts the location, in pixel coordinates, of the markers at each zoom level.
         // somewhat inaccurate b/c some latlngs are close enough that px coordinates are the same, 
@@ -299,7 +278,10 @@ import { getPointsOnSameSlope } from "./geometry/getPointsOnSameSlopeAndCertainD
             const uniqueCoordsKeys = Object.keys(data);
 
             for (let i = mapManager.minZoom; i <= mapManager.maxZoom; i++) {
-                this.markersToRenderAtEachZoomLevel[i] = []
+                this.markersToRenderAtEachZoomLevel[i] = {
+                    overlap: [], 
+                    merge: []
+                }
             }
             console.log(this.markersToRenderAtEachZoomLevel);
             // what info is needed for the prediction? 
@@ -408,7 +390,16 @@ import { getPointsOnSameSlope } from "./geometry/getPointsOnSameSlopeAndCertainD
                                 break;
                         }
                     }
-                    this.markersToRenderAtEachZoomLevel[zoomLevel].push({
+                    this.markersToRenderAtEachZoomLevel[zoomLevel].overlap.push({
+                        id: `group-${j}`,
+                        coords: markerCoordsInPx,
+                        radius: data[uniqueCoordsKeys[j]].people.length + Math.log(zoomLevel * 100),
+                        people: data[uniqueCoordsKeys[j]].people,
+                        members: [uniqueCoordsKeys[j]],
+                        inGroup: false
+                    });
+
+                    this.markersToRenderAtEachZoomLevel[zoomLevel].merge.push({
                         id: `group-${j}`,
                         coords: markerCoordsInPx,
                         radius: data[uniqueCoordsKeys[j]].people.length + Math.log(zoomLevel * 100),
@@ -418,12 +409,12 @@ import { getPointsOnSameSlope } from "./geometry/getPointsOnSameSlopeAndCertainD
                     });
                 }   
                 // merge markers
-                this.markersToRenderAtEachZoomLevel[zoomLevel] = markerMergeV8(this.markersToRenderAtEachZoomLevel[zoomLevel]);
+                this.markersToRenderAtEachZoomLevel[zoomLevel].merge = markerMergeV8(this.markersToRenderAtEachZoomLevel[zoomLevel].merge);
                 
                 factor++;
                 
             }
-            console.log(JSON.parse(JSON.stringify(this.markersToRenderAtEachZoomLevel)));
+            // console.log(JSON.parse(JSON.stringify(this.markersToRenderAtEachZoomLevel)));
         },
         renderMarkers() {
             const data = controller.getPeopleData();
@@ -435,61 +426,123 @@ import { getPointsOnSameSlope } from "./geometry/getPointsOnSameSlopeAndCertainD
             }
             const renderMode = controller.getMarkerViewMode();
             const uniqueCoordsKeys = Object.keys(data);
-            if (renderMode === "merge") {
-                this.renderMarkersUsingPredictions();
-                return;
-                let newMarkers = [];
-                for (let i = 0; i < uniqueCoordsKeys.length; i++) {
-                    newMarkers.push({
-                        id: `group-${i}`,
-                        coords: mapManager.map.latLngToContainerPoint([data[uniqueCoordsKeys[i]].lat, data[uniqueCoordsKeys[i]].lng]),
-                        radius: data[uniqueCoordsKeys[i]].people.length + Math.log(mapManager.map.getZoom() * 100), // data[uniqueCoordsKeys[i]].people.length > 5 ? data[uniqueCoordsKeys[i]].people.length + mapManager.map.getZoom() * 0.5 : data[uniqueCoordsKeys[i]].people.length + 2 + mapManager.map.getZoom(),
-                        people: data[uniqueCoordsKeys[i]].people,
-                        members: [uniqueCoordsKeys[i]],
-                        inGroup: false
-                    });
-                }
-                
-                newMarkers = markerMergeV8(newMarkers);
-
-                newMarkers = markerSplitV3(newMarkers, 1 + Math.log(mapManager.map.getZoom() * 100));
-
-                this.actuallyRenderMarkersOnMap(newMarkers, "px", "realtime", null);
-
-            } else {
-                const markers = [];
-                for (let i = 0; i < uniqueCoordsKeys.length; i++) {
-                    markers.push({
-                        id: `group-${i}`,
-                        coords: [data[uniqueCoordsKeys[i]].lat, data[uniqueCoordsKeys[i]].lng],
-                        radius: data[uniqueCoordsKeys[i]].people.length + Math.log(mapManager.map.getZoom() * 100),
-                        people: data[uniqueCoordsKeys[i]].people,
-                        members: [uniqueCoordsKeys[i]],
-                        inGroup: false
-                    });
-                }
-
-                markers.forEach((marker) => {
-                    const regionCounts = {
-                        "fakeRegionForLogic": -Infinity
-                    };
-                    let mostCommonRegion = "fakeRegionForLogic";
-                    for (let i = 0; i < marker.people.length; i++) {
-                        const region = marker.people[i].region;
-                        if (!(region in regionCounts)) {
-                            regionCounts[region] = 1;
-                        } else {
-                            regionCounts[region]++;
-                        }
-                        if (regionCounts[region] > regionCounts[mostCommonRegion]) {
-                            mostCommonRegion = region;
-                        }
+            switch (renderMode) {
+                case ("overlap-real-time"):
+                    const markers = [];
+                    for (let i = 0; i < uniqueCoordsKeys.length; i++) {
+                        markers.push({
+                            id: `group-${i}`,
+                            coords: [data[uniqueCoordsKeys[i]].lat, data[uniqueCoordsKeys[i]].lng],
+                            radius: data[uniqueCoordsKeys[i]].people.length + Math.log(mapManager.map.getZoom() * 100),
+                            people: data[uniqueCoordsKeys[i]].people,
+                            members: [uniqueCoordsKeys[i]],
+                            inGroup: false
+                        });
                     }
-                    marker.mostCommonRegion = mostCommonRegion;
-                })
 
-                this.actuallyRenderMarkersOnMap(markers, "latlng", "realtime", null);
+                    markers.forEach((marker) => {
+                        const regionCounts = {
+                            "fakeRegionForLogic": -Infinity
+                        };
+                        let mostCommonRegion = "fakeRegionForLogic";
+                        for (let i = 0; i < marker.people.length; i++) {
+                            const region = marker.people[i].region;
+                            if (!(region in regionCounts)) {
+                                regionCounts[region] = 1;
+                            } else {
+                                regionCounts[region]++;
+                            }
+                            if (regionCounts[region] > regionCounts[mostCommonRegion]) {
+                                mostCommonRegion = region;
+                            }
+                        }
+                        marker.mostCommonRegion = mostCommonRegion;
+                    })
+
+                    this.actuallyRenderMarkersOnMap(markers, "latlng", "realtime", null);
+                    break;
+
+                case ("merge-real-time"):
+                    let newMarkers = [];
+                    for (let i = 0; i < uniqueCoordsKeys.length; i++) {
+                        newMarkers.push({
+                            id: `group-${i}`,
+                            coords: mapManager.map.latLngToContainerPoint([data[uniqueCoordsKeys[i]].lat, data[uniqueCoordsKeys[i]].lng]),
+                            radius: data[uniqueCoordsKeys[i]].people.length + Math.log(mapManager.map.getZoom() * 100), // data[uniqueCoordsKeys[i]].people.length > 5 ? data[uniqueCoordsKeys[i]].people.length + mapManager.map.getZoom() * 0.5 : data[uniqueCoordsKeys[i]].people.length + 2 + mapManager.map.getZoom(),
+                            people: data[uniqueCoordsKeys[i]].people,
+                            members: [uniqueCoordsKeys[i]],
+                            inGroup: false
+                        });
+                    }
+                    
+                    newMarkers = markerMergeV8(newMarkers);
+
+                    // newMarkers = markerSplitV3(newMarkers, 1 + Math.log(mapManager.map.getZoom() * 100));
+
+                    this.actuallyRenderMarkersOnMap(newMarkers, "px", "realtime", null);
+                    break;
+                case ("overlap-predicted"):
+                    this.renderMarkersUsingPredictions("overlap");
+                    break;
+                case ("merge-predicted"):
+                    this.renderMarkersUsingPredictions("merge");
+                    break;
             }
+            // if (renderMode === "merge") {
+            //     this.renderMarkersUsingPredictions();
+            //     return;
+            //     let newMarkers = [];
+            //     for (let i = 0; i < uniqueCoordsKeys.length; i++) {
+            //         newMarkers.push({
+            //             id: `group-${i}`,
+            //             coords: mapManager.map.latLngToContainerPoint([data[uniqueCoordsKeys[i]].lat, data[uniqueCoordsKeys[i]].lng]),
+            //             radius: data[uniqueCoordsKeys[i]].people.length + Math.log(mapManager.map.getZoom() * 100), // data[uniqueCoordsKeys[i]].people.length > 5 ? data[uniqueCoordsKeys[i]].people.length + mapManager.map.getZoom() * 0.5 : data[uniqueCoordsKeys[i]].people.length + 2 + mapManager.map.getZoom(),
+            //             people: data[uniqueCoordsKeys[i]].people,
+            //             members: [uniqueCoordsKeys[i]],
+            //             inGroup: false
+            //         });
+            //     }
+                
+            //     newMarkers = markerMergeV8(newMarkers);
+
+            //     newMarkers = markerSplitV3(newMarkers, 1 + Math.log(mapManager.map.getZoom() * 100));
+
+            //     this.actuallyRenderMarkersOnMap(newMarkers, "px", "realtime", null);
+
+            // } else {
+            //     const markers = [];
+            //     for (let i = 0; i < uniqueCoordsKeys.length; i++) {
+            //         markers.push({
+            //             id: `group-${i}`,
+            //             coords: [data[uniqueCoordsKeys[i]].lat, data[uniqueCoordsKeys[i]].lng],
+            //             radius: data[uniqueCoordsKeys[i]].people.length + Math.log(mapManager.map.getZoom() * 100),
+            //             people: data[uniqueCoordsKeys[i]].people,
+            //             members: [uniqueCoordsKeys[i]],
+            //             inGroup: false
+            //         });
+            //     }
+
+            //     markers.forEach((marker) => {
+            //         const regionCounts = {
+            //             "fakeRegionForLogic": -Infinity
+            //         };
+            //         let mostCommonRegion = "fakeRegionForLogic";
+            //         for (let i = 0; i < marker.people.length; i++) {
+            //             const region = marker.people[i].region;
+            //             if (!(region in regionCounts)) {
+            //                 regionCounts[region] = 1;
+            //             } else {
+            //                 regionCounts[region]++;
+            //             }
+            //             if (regionCounts[region] > regionCounts[mostCommonRegion]) {
+            //                 mostCommonRegion = region;
+            //             }
+            //         }
+            //         marker.mostCommonRegion = mostCommonRegion;
+            //     })
+
+            //     this.actuallyRenderMarkersOnMap(markers, "latlng", "realtime", null);
+            // }
         }
     }
 
