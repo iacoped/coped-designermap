@@ -796,35 +796,51 @@ export function markerMergeV8(markers) {
                 continue;
             }
             for (let j of markerKeys) {
-                const c1 = markers[i];
-                const c2 = markers[j];
+                // const c1 = markers[i];
+                // const c2 = markers[j];
+                
                 // if they are the same or already in the same group, don't compare it
-                if (c1.id === c2.id || c2.inGroup || c2.static) {
+                if (markers[i].id === markers[j].id || markers[j].inGroup || markers[j].static) {
+                    continue;
+                }
+                // somehow stuff is making it here when inGroup is true, figure out why later
+                if (markers[i].inGroup || markers[j].inGroup) {
+                    // console.log(JSON.parse(JSON.stringify(markers[i])), JSON.parse(JSON.stringify(markers[j])));
                     continue;
                 }
                 // logic for computing intersection
-                const distance = getDistanceBetweenTwoPoints(c1.coords, c2.coords);
-                const r1 = c1.radius;
-                const r2 = c2.radius;
+                const distance = getDistanceBetweenTwoPoints(markers[i].coords, markers[j].coords);
+                const r1 = markers[i].radius;
+                const r2 = markers[j].radius;
                 const intersectionInfo = getTwoCirclesIntersectionInfo(r1, r2, distance);
                 // console.log(intersectionInfo);
                 if (intersectionInfo.intersectsWithoutTouching) {
                     intersectionsStillExist = true;
                     // decide rules for the new marker groups size and position
-                    let winner, loser;
-                    if (c1.radius >= c2.radius) {
-                        winner = c1;
-                        loser = c2;
+                    let winner;
+                    let loser;
+                    if (r1 >= r2) {
+                        winner = markers[i];
+                        loser = markers[j];
+                        // console.log(winner === markers[i], loser === markers[j]);
                     } else {
-                        winner = c2;
-                        loser = c1;
+                        winner = markers[j];
+                        loser = markers[i];
+                        // console.log(winner === markers[j], loser === markers[i]);
                     }
-                    // winner.members.push(loser.id);
+
                     winner.members = winner.members.concat(loser.members);
                     winner.people = winner.people.concat(loser.people);
+                    loser.inGroup = true;
+                    // if (loser.id === "group-3") {
+                        
+                    //     console.log(JSON.parse(JSON.stringify(winner)), JSON.parse(JSON.stringify(loser)));
+                    //     console.log("1")
+                    // }
+                    
 
                     // loser.members = [];
-                    loser.inGroup = true;
+                    
                     
                     if (!(intersectionInfo.c1ContainsC2 || intersectionInfo.c2ContainsC1)) {
 
@@ -867,6 +883,6 @@ export function markerMergeV8(markers) {
     }
     // all the markers that are marked inGroup are already part of a group
     const mergedMarkers = markers;
-
+    // console.log("end")
     return mergedMarkers;
 }

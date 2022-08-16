@@ -186,6 +186,7 @@ import { getPointsOnSameSlope } from "./geometry/getPointsOnSameSlopeAndCertainD
                                 fillOpacity: 0.5
                             }
                         )
+
                         marker.bindPopup(`<p>${group.people[0].name}</p>`);
                         this.markerDOMEles.push(marker);
                         marker.addTo(mapManager.map);
@@ -241,7 +242,18 @@ import { getPointsOnSameSlope } from "./geometry/getPointsOnSameSlopeAndCertainD
                             marker.bindPopup(`<p>${group.people.length}</p>`);
                             // do the zooming 
                             marker.on("click", (e) => {
-
+                                console.log(JSON.parse(JSON.stringify(group)));
+                                let levelToZoomTo = null;
+                                // searches for the closest higher zoom level its members become different or it splits into individuals (means it splits)
+                                for (let zoomLevel = mapManager.map.getZoom() + 1; zoomLevel <= mapManager.maxZoom; zoomLevel++) {
+                                    const groupAtZoomLevel = this.markersToRenderAtEachZoomLevel[zoomLevel][group.id];
+                                    if (group.members.length != groupAtZoomLevel.members.length || groupAtZoomLevel.split) {
+                                        console.log("splits at", zoomLevel);
+                                        levelToZoomTo = zoomLevel;
+                                        // mapManager.map
+                                        break;
+                                    }
+                                }   
                             })
                             this.markerDOMEles.push(marker);
                             marker.addTo(mapManager.map);
