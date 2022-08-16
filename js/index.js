@@ -145,23 +145,24 @@ import { getPointsOnSameSlope } from "./geometry/getPointsOnSameSlopeAndCertainD
 
     const markerManager = {
         markerDOMEles: [],
+
         markersToRenderAtEachZoomLevel: {},
+
         referencePoint: {
             posInLatLng: new L.LatLng(100, -40),
             posInPxCoordsAtStartUp: null
         },
+
         init() {
             this.computeMarkerStateAtEachZoomLevel();
             this.renderMarkers();
         },
 
         removeMarkersFromMap() {
-            if (true) { // maybe can consider not re-rendering if nothing changes
-                for (let i = 0; i < this.markerDOMEles.length; i++) {
-                    this.markerDOMEles[i].removeFrom(mapManager.map);
-                }
-                this.markerDOMEles = [];
+            for (let i = 0; i < this.markerDOMEles.length; i++) {
+                this.markerDOMEles[i].removeFrom(mapManager.map);
             }
+            this.markerDOMEles = [];
         },
 
         // offset is only used with prediction method.
@@ -295,29 +296,21 @@ import { getPointsOnSameSlope } from "./geometry/getPointsOnSameSlopeAndCertainD
                     }
                 } else if (refPointInPxCoords.x == markerCoordsInPx.x) {
                     if (refPointInPxCoords.y > markerCoordsInPx.y) {
-                        // winner.coords.y -= distanceToMoveMergedMarker;
                         directionToPlaceMarkerRelativeToReferencePoint = "above it";
                     } else {
-                        // winner.coords.y += distanceToMoveMergedMarker;
                         directionToPlaceMarkerRelativeToReferencePoint = "below it";
                     }
                 } else {
                     slope = getSlopeGivenTwoPoints(refPointInPxCoords, markerCoordsInPx);
-                    // const pointsOnSameSlope = getPointsOnSameSlope(markerCoordsInPx, distance, slope);
                     if (slope < 0 && refPointInPxCoords.x > markerCoordsInPx.x) {
-                        // winner.coords = pointsOnSameSlope[1];   
                         directionToPlaceMarkerRelativeToReferencePoint = "its upper left";
                     } else if (slope < 0 && refPointInPxCoords.x < markerCoordsInPx.x) {
                         directionToPlaceMarkerRelativeToReferencePoint = "its bottom right";
-                        // winner.coords = pointsOnSameSlope[0];
                     } else if (slope > 0 && refPointInPxCoords.x < markerCoordsInPx.x) {
                         directionToPlaceMarkerRelativeToReferencePoint = "its upper right";
-                        // winner.coords = pointsOnSameSlope[0];
                     } else if (slope > 0 && refPointInPxCoords.x > markerCoordsInPx.x) {
                         directionToPlaceMarkerRelativeToReferencePoint = "its bottom left";
-                        // winner.coords = pointsOnSameSlope[1];
                     }
-                    // winner.radius += 1;
                 }
                 referenceInfo.push({
                     distance: distance,
@@ -391,10 +384,11 @@ import { getPointsOnSameSlope } from "./geometry/getPointsOnSameSlopeAndCertainD
                         inGroup: false
                     });
                 }   
+                const radiusOfMarkerRepresentingOnePerson = 1 + Math.log(zoomLevel * 100);
                 // merge markers
                 this.markersToRenderAtEachZoomLevel[zoomLevel] = markerMergeV8(this.markersToRenderAtEachZoomLevel[zoomLevel]);
-                // this.markersToRenderAtEachZoomLevel[zoomLevel] = markerSplitV2(this.markersToRenderAtEachZoomLevel[zoomLevel]);
-
+                this.markersToRenderAtEachZoomLevel[zoomLevel] = markerSplitV3(this.markersToRenderAtEachZoomLevel[zoomLevel], radiusOfMarkerRepresentingOnePerson);
+                console.log(this.markersToRenderAtEachZoomLevel);
                 factor++;
                 
             }
@@ -494,7 +488,6 @@ import { getPointsOnSameSlope } from "./geometry/getPointsOnSameSlopeAndCertainD
                 })
                 
             })
-            // console.log(uniqueCoords);
             return uniqueCoords;
         },
 
