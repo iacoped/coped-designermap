@@ -165,6 +165,15 @@ import { getPointsOnSameSlope } from "./geometry/getPointsOnSameSlopeAndCertainD
             // this.renderMarkersUsingPredictions();
         },
 
+        removeMarkersFromMap() {
+            if (true) { // maybe can consider not re-rendering if nothing changes
+                for (let i = 0; i < this.markerDOMEles.length; i++) {
+                    this.markerDOMEles[i].removeFrom(mapManager.map);
+                }
+                this.markerDOMEles = [];
+            }
+        },
+
         // offset is only used with prediction method.
         actuallyRenderMarkersOnMap(markers, coordinateType, markerComputationMethod, offset) {
             for (let i of markers) {
@@ -208,8 +217,8 @@ import { getPointsOnSameSlope } from "./geometry/getPointsOnSameSlopeAndCertainD
                             for (let subBubble of i.splitBubbles) {
                                 let subBubbleCoords = JSON.parse(JSON.stringify(subBubble.coords))
                                 if (markerComputationMethod === "prediction") {
-                                    subBubbleCoords.coords.x += offset.xShiftAmount;
-                                    subBubbleCoords.coords.y += offset.yShiftAmount;
+                                    subBubbleCoords.x += offset.xShiftAmount;
+                                    subBubbleCoords.y += offset.yShiftAmount;
                                 }
                                 let marker = new L.circleMarker(
                                     coordinateType === "latlng" ? subBubbleCoords : mapManager.map.containerPointToLatLng(subBubbleCoords),
@@ -249,12 +258,6 @@ import { getPointsOnSameSlope } from "./geometry/getPointsOnSameSlopeAndCertainD
         },
 
         renderMarkersUsingPredictions(markerMode) {
-            if (true) { // maybe can consider not re-rendering if nothing changes
-                for (let i = 0; i < this.markerDOMEles.length; i++) {
-                    this.markerDOMEles[i].removeFrom(mapManager.map);
-                }
-                this.markerDOMEles = [];
-            }
             const currentZoomLevel = mapManager.map.getZoom();
             // the location of the reference point relative to the container will be different from its position on startup.
             // so need to offset all the markers by some amount to place them in the correct location.
@@ -410,20 +413,16 @@ import { getPointsOnSameSlope } from "./geometry/getPointsOnSameSlopeAndCertainD
                 }   
                 // merge markers
                 this.markersToRenderAtEachZoomLevel[zoomLevel].merge = markerMergeV8(this.markersToRenderAtEachZoomLevel[zoomLevel].merge);
-                
+                this.markersToRenderAtEachZoomLevel[zoomLevel].merge = markerSplitV2(this.markersToRenderAtEachZoomLevel[zoomLevel].merge);
+                console.log(JSON.parse(JSON.stringify(this.markersToRenderAtEachZoomLevel)));
+
                 factor++;
                 
             }
-            // console.log(JSON.parse(JSON.stringify(this.markersToRenderAtEachZoomLevel)));
         },
         renderMarkers() {
             const data = controller.getPeopleData();
-            if (true) { // maybe can consider not re-rendering if nothing changes
-                for (let i = 0; i < this.markerDOMEles.length; i++) {
-                    this.markerDOMEles[i].removeFrom(mapManager.map);
-                }
-                this.markerDOMEles = [];
-            }
+            this.removeMarkersFromMap();
             const renderMode = controller.getMarkerViewMode();
             const uniqueCoordsKeys = Object.keys(data);
             switch (renderMode) {

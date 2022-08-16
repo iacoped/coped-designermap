@@ -112,8 +112,8 @@ export function markerSplitV1(markers, radiusOfMarkerRepresentingOnePerson) {
 // for circles who are not split but were part of a circle that was split last time, merge and split them?
 // 
 export function markerSplitV2(newMarkers, oldMarkers, radiusOfMarkerRepresentingOnePerson) {
-    console.log("new markers: ", newMarkers);
-    console.log("old markers: ", oldMarkers);
+    // console.log("new markers: ", newMarkers);
+    // console.log("old markers: ", oldMarkers);
     let splitMarkers = [];
     for (let i of newMarkers) {
         // TODO: add additional rule determining if split occurs or not
