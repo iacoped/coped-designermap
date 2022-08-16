@@ -863,34 +863,7 @@ export function markerMergeV8(markers) {
         }
     }
     // all the markers that are marked inGroup are already part of a group
-    // const mergedMarkers = markers.filter(markerGroup => !markerGroup.inGroup);
     const mergedMarkers = markers;
-    // console.log(markersHashMap);
-    // determine most common region across all people represented by this marker
-    // mergedMarkers.forEach((marker) => {
-    //     const regionCounts = {
-    //         "fakeRegionForLogic": -Infinity
-    //     };
-    //     let mostCommonRegion = "fakeRegionForLogic";
-    //     for (let i = 0; i < marker.people.length; i++) {
-    //         const region = marker.people[i].region;
-    //         if (!(region in regionCounts)) {
-    //             regionCounts[region] = 1;
-    //         } else {
-    //             regionCounts[region]++;
-    //         }
-    //         if (regionCounts[region] > regionCounts[mostCommonRegion]) {
-    //             mostCommonRegion = region;
-    //         }
-    //     }
-    //     marker.mostCommonRegion = mostCommonRegion;
-    //     // console.log(regionCounts);
-    // })
-    // let numUniqueMembers = 0;
-    // for (let i of mergedMarkers) {
-    //     numUniqueMembers += i.members.length;
-    // }
 
-    // console.log(numUniqueMembers);
     return mergedMarkers;
 }

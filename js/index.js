@@ -195,7 +195,7 @@ import { getPointsOnSameSlope } from "./geometry/getPointsOnSameSlopeAndCertainD
                                     mapManager.map.containerPointToLatLng(markerCoords),
                                     {
                                         color: "#FF5710",
-                                        radius: (i.radius * 2) + i.people.length,
+                                        radius: i.radius,
                                         stroke: false,
                                         fillOpacity: 0.9
                                     }
@@ -388,9 +388,8 @@ import { getPointsOnSameSlope } from "./geometry/getPointsOnSameSlopeAndCertainD
                 // merge markers
                 this.markersToRenderAtEachZoomLevel[zoomLevel] = markerMergeV8(this.markersToRenderAtEachZoomLevel[zoomLevel]);
                 this.markersToRenderAtEachZoomLevel[zoomLevel] = markerSplitV3(this.markersToRenderAtEachZoomLevel[zoomLevel], radiusOfMarkerRepresentingOnePerson);
-                console.log(this.markersToRenderAtEachZoomLevel);
-                factor++;
                 
+                factor++;
             }
         },
     }

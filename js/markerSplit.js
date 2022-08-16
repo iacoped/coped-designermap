@@ -197,9 +197,9 @@ export function markerSplitV2(newMarkers, oldMarkers, radiusOfMarkerRepresenting
 
 // for circles who are not split but were part of a circle that was split last time, merge and split them?
 // 
-export function markerSplitV3(newMarkers, radiusOfMarkerRepresentingOnePerson) {
+export function markerSplitV3(markers, radiusOfMarkerRepresentingOnePerson) {
     let splitMarkers = [];
-    for (let i of newMarkers) {
+    for (let i of markers) {
         if (i.inGroup) {
             splitMarkers.push(i);
             continue;
@@ -208,7 +208,7 @@ export function markerSplitV3(newMarkers, radiusOfMarkerRepresentingOnePerson) {
         // assign bubbles coordinates such that no bubble overlaps
         let splitAllowed = true;
         const radiusOfCircleForSplitting = (i.radius * 2) + (i.people.length);
-        for (let j of newMarkers) {
+        for (let j of markers) {
             if (j.inGroup || i.id === j.id) {
                 continue;
             }
@@ -221,6 +221,21 @@ export function markerSplitV3(newMarkers, radiusOfMarkerRepresentingOnePerson) {
                 splitAllowed = false;
             }
         }
+
+        // for (let j of splitMarkers) {
+        //     if (j.inGroup || i.id === j.id) {
+        //         continue;
+        //     }
+        //     const distance = getDistanceBetweenTwoPoints(i.coords, j.coords);
+        //     let r1 = radiusOfCircleForSplitting;
+        //     let r2 = j.radius;
+        //     const intersectionInfo = getTwoCirclesIntersectionInfo(r1, r2, distance);
+        //     if (intersectionInfo.intersects) {
+        //         // console.log("no split");
+        //         splitAllowed = false;
+        //     }
+        // }
+
         if (i.people.length > 1 && splitAllowed) {
             
             let splitBubbles = [];
@@ -243,7 +258,6 @@ export function markerSplitV3(newMarkers, radiusOfMarkerRepresentingOnePerson) {
                         } 
                     }
                     tries++;
-                    // console.log(splitBubbles)
                 }
                 if (tries == 1000 && coordRejected) {
                     console.log(`acceptable position for marker #${splitBubbles.length + 1} could not be found within 1000 attempts for group: `, i)
@@ -261,14 +275,13 @@ export function markerSplitV3(newMarkers, radiusOfMarkerRepresentingOnePerson) {
                 }
                 
             }
-            // if (splitBubbles.length != i.people.length) {
-            //     console.log(i, "fail")
-            // }
+
             if (splitAllowed) {
                 if (i.splitBubbles === undefined) {
                     i.splitBubbles = [];
                 } 
                 i.splitBubbles = i.splitBubbles.concat(splitBubbles);
+                i.radius = (i.radius * 2) + i.people.length,
                 i.split = true;
             } else {
                 i.split = false;
@@ -279,9 +292,6 @@ export function markerSplitV3(newMarkers, radiusOfMarkerRepresentingOnePerson) {
             i.split = false;
             splitMarkers.push(i);
         }
-    }
-    for (let i of splitMarkers) {
-
     }
     return splitMarkers;
 }
