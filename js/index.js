@@ -167,45 +167,47 @@ import { getPointsOnSameSlope } from "./geometry/getPointsOnSameSlopeAndCertainD
 
         // offset is only used with prediction method.
         actuallyRenderMarkersOnMap(markers, offset) {
-            for (let i of markers) {
-                let markerCoords = JSON.parse(JSON.stringify(i.coords));
+            const markerKeys = Object.keys(markers);
+            for (let i of markerKeys) {
+                const group = markers[i];
 
-                markerCoords.x += offset.xShiftAmount;
-                markerCoords.y += offset.yShiftAmount;
+                if (!group.inGroup) {
+                    let markerCoords = JSON.parse(JSON.stringify(group.coords));
 
-                if (!i.inGroup) {
-                    if (i.people.length == 1) {
+                    markerCoords.x += offset.xShiftAmount;
+                    markerCoords.y += offset.yShiftAmount;
+                    if (group.people.length == 1) {
                         let marker = new L.circleMarker(
                             mapManager.map.containerPointToLatLng(markerCoords),
                             {
                                 color: "blue",
-                                radius: i.radius,
+                                radius: group.radius,
                                 stroke: false,
                                 fillOpacity: 0.5
                             }
                         )
-                        marker.bindPopup(`<p>${i.people[0].name}</p>`);
+                        marker.bindPopup(`<p>${group.people[0].name}</p>`);
                         this.markerDOMEles.push(marker);
                         marker.addTo(mapManager.map);
                     } else {
-                        if (i.split) {
+                        if (group.split) {
                             // shows the circle that was used to generate the split markers.
                             if (true) {
                                 let marker = new L.circleMarker(
                                     mapManager.map.containerPointToLatLng(markerCoords),
                                     {
                                         color: "#FF5710",
-                                        radius: i.radius,
+                                        radius: group.radius,
                                         stroke: false,
                                         fillOpacity: 0.9
                                     }
                                 )
                                 this.markerDOMEles.push(marker);
-                                marker.bindPopup(`<p>${i.people.length}</p>`);
+                                marker.bindPopup(`<p>${group.people.length}</p>`);
                                 marker.addTo(mapManager.map);
                             }
                             
-                            for (let subBubble of i.splitBubbles) {
+                            for (let subBubble of group.splitBubbles) {
                                 let subBubbleCoords = JSON.parse(JSON.stringify(subBubble.coords));
 
                                 subBubbleCoords.x += offset.xShiftAmount;
@@ -230,13 +232,13 @@ import { getPointsOnSameSlope } from "./geometry/getPointsOnSameSlopeAndCertainD
                                 mapManager.map.containerPointToLatLng(markerCoords),
                                 {
                                     color: "#FF5710",
-                                    radius: i.radius,
+                                    radius: group.radius,
                                     stroke: false,
                                     fillOpacity: 0.9
                                 }
                             )
 
-                            // marker.bindPopup(`<p>${i.people.length}</p>`);
+                            marker.bindPopup(`<p>${group.people.length}</p>`);
                             // do the zooming 
                             marker.on("click", (e) => {
 
@@ -275,7 +277,7 @@ import { getPointsOnSameSlope } from "./geometry/getPointsOnSameSlopeAndCertainD
             const uniqueCoordsKeys = Object.keys(data);
 
             for (let i = mapManager.minZoom; i <= mapManager.maxZoom; i++) {
-                this.markersToRenderAtEachZoomLevel[i] = [];
+                this.markersToRenderAtEachZoomLevel[i] = {};
             }
 
             // what info is needed for the prediction? 
@@ -375,20 +377,71 @@ import { getPointsOnSameSlope } from "./geometry/getPointsOnSameSlopeAndCertainD
                         }
                     }
 
-                    this.markersToRenderAtEachZoomLevel[zoomLevel].push({
-                        id: `group-${j}`,
-                        coords: markerCoordsInPx,
-                        radius: data[uniqueCoordsKeys[j]].people.length + Math.log(zoomLevel * 100),
-                        people: data[uniqueCoordsKeys[j]].people,
-                        members: [uniqueCoordsKeys[j]],
-                        inGroup: false
-                    });
+                    // if this key is already present, means it was already split at the previous zoom level.
+                    // all that needs to be done is update the location of its child markers.
+                    if (`group-${j}` in this.markersToRenderAtEachZoomLevel[zoomLevel]) {
+                        const ref = this.markersToRenderAtEachZoomLevel[zoomLevel][`group-${j}`];
+                        if (!ref.inGroup) {
+                            ref.coords = markerCoordsInPx;
+                            const originalCoords = this.markersToRenderAtEachZoomLevel[ref.zoomLevelAtSplit][`group-${j}`].coords;
+                            
+                            const offset = {
+                                xShiftAmount: originalCoords.x - ref.coords.x,
+                                yShiftAmount: originalCoords.y - ref.coords.y
+                            }
+
+                            // somehow this works, figure out why later
+                            for (let bubble of ref.splitBubbles) {
+                                bubble.coords.x -= offset.xShiftAmount;
+                                bubble.coords.y -= offset.yShiftAmount;
+                            }
+                        }
+                        
+                    } else {
+                        this.markersToRenderAtEachZoomLevel[zoomLevel][`group-${j}`] = {
+                            id: `group-${j}`,
+                            coords: markerCoordsInPx,
+                            radius: data[uniqueCoordsKeys[j]].people.length + Math.log(zoomLevel * 100),
+                            people: data[uniqueCoordsKeys[j]].people,
+                            members: [`group-${j}`],
+                            inGroup: false
+                        };
+                    }
+
                 }   
                 const radiusOfMarkerRepresentingOnePerson = 1 + Math.log(zoomLevel * 100);
                 // merge markers
                 this.markersToRenderAtEachZoomLevel[zoomLevel] = markerMergeV8(this.markersToRenderAtEachZoomLevel[zoomLevel]);
                 this.markersToRenderAtEachZoomLevel[zoomLevel] = markerSplitV3(this.markersToRenderAtEachZoomLevel[zoomLevel], radiusOfMarkerRepresentingOnePerson);
-                
+
+                // if a marker is "split" and shows all info at a zoom level, its state stays the same at all higher zoom levels
+                const keys = Object.keys(this.markersToRenderAtEachZoomLevel[zoomLevel]);
+                for (let key of keys) {
+                    if (this.markersToRenderAtEachZoomLevel[zoomLevel][key].static && !this.markersToRenderAtEachZoomLevel[zoomLevel][key].inGroup) {
+                        for (let zoom = zoomLevel + 1; zoom <= mapManager.maxZoom; zoom++) { 
+                            // console.log(this.markersToRenderAtEachZoomLevel[zoomLevel][key]);
+                            this.markersToRenderAtEachZoomLevel[zoom][key] = JSON.parse(JSON.stringify(this.markersToRenderAtEachZoomLevel[zoomLevel][key]));
+                            const ref = this.markersToRenderAtEachZoomLevel[zoom][key];
+                            ref.zoomLevelAtSplit = zoomLevel;
+
+                            for (let member of ref.members) {
+                                if (member === key) {
+                                    continue;
+                                }
+                                this.markersToRenderAtEachZoomLevel[zoom][member] = {
+                                    inGroup: true,
+                                    // id: member,
+                                    // coords: markerCoordsInPx,
+                                    // radius: data[uniqueCoordsKeys[j]].people.length + Math.log(zoomLevel * 100),
+                                    // people: data[uniqueCoordsKeys[j]].people,
+                                    // members: [`group-${j}`],
+                                    // inGroup: false
+                                }
+                            }
+                        }
+                    }
+                }
+
                 factor++;
             }
         },

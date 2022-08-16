@@ -198,23 +198,26 @@ export function markerSplitV2(newMarkers, oldMarkers, radiusOfMarkerRepresenting
 // for circles who are not split but were part of a circle that was split last time, merge and split them?
 // 
 export function markerSplitV3(markers, radiusOfMarkerRepresentingOnePerson) {
-    let splitMarkers = [];
-    for (let i of markers) {
-        if (i.inGroup) {
-            splitMarkers.push(i);
+    // let splitMarkers = [];
+    const markerKeys = Object.keys(markers);
+    for (let i of markerKeys) {
+        const c1 = markers[i];
+        if (c1.inGroup || c1.static) {
+            // splitMarkers.push(c1);
             continue;
         }
         // TODO: add additional rule determining if split occurs or not
         // assign bubbles coordinates such that no bubble overlaps
         let splitAllowed = true;
-        const radiusOfCircleForSplitting = (i.radius * 2) + (i.people.length);
-        for (let j of markers) {
-            if (j.inGroup || i.id === j.id) {
+        const radiusOfCircleForSplitting = (c1.radius * 2) + (c1.people.length);
+        for (let j of markerKeys) {
+            const c2 = markers[j];
+            if (c2.inGroup || c1.id === c2.id) {
                 continue;
             }
-            const distance = getDistanceBetweenTwoPoints(i.coords, j.coords);
+            const distance = getDistanceBetweenTwoPoints(c1.coords, c2.coords);
             let r1 = radiusOfCircleForSplitting;
-            let r2 = j.radius;
+            let r2 = c2.radius;
             const intersectionInfo = getTwoCirclesIntersectionInfo(r1, r2, distance);
             if (intersectionInfo.intersects) {
                 // console.log("no split");
@@ -236,10 +239,10 @@ export function markerSplitV3(markers, radiusOfMarkerRepresentingOnePerson) {
         //     }
         // }
 
-        if (i.people.length > 1 && splitAllowed) {
+        if (c1.people.length > 1 && splitAllowed) {
             
             let splitBubbles = [];
-            for (let person of i.people) {
+            for (let person of c1.people) {
 
                 let coordRejected = true;
                 let rand = null;
@@ -247,7 +250,7 @@ export function markerSplitV3(markers, radiusOfMarkerRepresentingOnePerson) {
                 // coordinate of split bubble cannot result in overlap with another bubble
                 while (coordRejected && tries != 1000) {
                     // coord is within a circle that has radius of original merged marker's radius * 2
-                    rand = getRandCoordsWithinCircle(i.coords, radiusOfCircleForSplitting, false);
+                    rand = getRandCoordsWithinCircle(c1.coords, radiusOfCircleForSplitting, false);
                     coordRejected = false;
                     for (let bubble of splitBubbles) {
                         const distance = getDistanceBetweenTwoPoints(bubble.coords, rand);
@@ -277,21 +280,22 @@ export function markerSplitV3(markers, radiusOfMarkerRepresentingOnePerson) {
             }
 
             if (splitAllowed) {
-                if (i.splitBubbles === undefined) {
-                    i.splitBubbles = [];
+                if (c1.splitBubbles === undefined) {
+                    c1.splitBubbles = [];
                 } 
-                i.splitBubbles = i.splitBubbles.concat(splitBubbles);
-                i.radius = (i.radius * 2) + i.people.length,
-                i.split = true;
+                c1.splitBubbles = c1.splitBubbles.concat(splitBubbles);
+                c1.radius = (c1.radius * 2) + c1.people.length,
+                c1.split = true;
+                c1.static = true;
             } else {
-                i.split = false;
+                c1.split = false;
             }
-            splitMarkers.push(i);
+            // splitMarkers.push(c1);
 
         } else {
-            i.split = false;
-            splitMarkers.push(i);
+            c1.split = false;
+            // splitMarkers.push(c1);
         }
     }
-    return splitMarkers;
+    return markers;
 }

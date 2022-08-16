@@ -787,34 +787,37 @@ export function markerMergeV8(markers) {
     //      1. find any markers m2 that are not in a group and m1 != m2, combine them into merged marker (add radius, find midpoint of i and marker)
     //      2. mark intersecting markers as "merged" already (they should not be considered anymore)
     //      3. don't mark i as merged (merged marker might end up intersecting with it in future)
+    const markerKeys = Object.keys(markers);
     let intersectionsStillExist = true; 
     while (intersectionsStillExist) {
         intersectionsStillExist = false;
-        for (let i of markers) {
-            if (i.inGroup) {
+        for (let i of markerKeys) {
+            if (markers[i].inGroup || markers[i].static) {
                 continue;
             }
-            for (let j of markers) {
+            for (let j of markerKeys) {
+                const c1 = markers[i];
+                const c2 = markers[j];
                 // if they are the same or already in the same group, don't compare it
-                if (i.id === j.id || j.inGroup) {
+                if (c1.id === c2.id || c2.inGroup || c2.static) {
                     continue;
                 }
                 // logic for computing intersection
-                const distance = getDistanceBetweenTwoPoints(i.coords, j.coords);
-                const r1 = i.radius;
-                const r2 = j.radius;
+                const distance = getDistanceBetweenTwoPoints(c1.coords, c2.coords);
+                const r1 = c1.radius;
+                const r2 = c2.radius;
                 const intersectionInfo = getTwoCirclesIntersectionInfo(r1, r2, distance);
                 // console.log(intersectionInfo);
                 if (intersectionInfo.intersectsWithoutTouching) {
                     intersectionsStillExist = true;
                     // decide rules for the new marker groups size and position
                     let winner, loser;
-                    if (i.radius >= j.radius) {
-                        winner = i;
-                        loser = j;
+                    if (c1.radius >= c2.radius) {
+                        winner = c1;
+                        loser = c2;
                     } else {
-                        winner = j;
-                        loser = i;
+                        winner = c2;
+                        loser = c1;
                     }
                     // winner.members.push(loser.id);
                     winner.members = winner.members.concat(loser.members);
