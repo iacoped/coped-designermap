@@ -137,7 +137,7 @@ import { designerInfoHTML } from "./components/designerInfo.js";
     const markerManager = {
         markerDOMEles: [],
         singlePersonColor: "#7a7a89",
-        multiplePersonColor: "#2596BE",
+        multiplePersonColor: "#39959A",
         markersToRenderAtEachZoomLevel: {},
 
         referencePoint: {
