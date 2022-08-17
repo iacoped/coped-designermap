@@ -181,7 +181,10 @@ import { designerInfoHTML } from "./components/designerInfo.js";
                         )
                         .bindPopup(designerInfoHTML(group.people[0]), 
                         {
-                            maxHeight: 300,
+                            minWidth: 300,
+                            maxWidth: 500,
+                            // maxHeight: 300,
+                            closeButton: false,
                             className: "designer-info"
                         });
 
@@ -227,7 +230,10 @@ import { designerInfoHTML } from "./components/designerInfo.js";
                                 )
                                 .bindPopup(designerInfoHTML(subBubble), 
                                 {
-                                    maxHeight: 300,
+                                    minWidth: 300,
+                                    maxWidth: 500,
+                                    // maxHeight: 300,
+                                    closeButton: false,
                                     className: "designer-info"
                                 });
 

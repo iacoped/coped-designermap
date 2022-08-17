@@ -43,11 +43,42 @@ body {
 }
 
 .designer-info .leaflet-popup-content-wrapper {
-    font-size: 36px;
     font-family: dinRoundPro;
     font-weight: bold;
-    background-color: white;
+    background-color: #2596BE;
     color: #2596BE;
+    border-radius: 0px;
 }
+
+.designer-info .leaflet-popup-tip {
+    background-color: #2596BE;
+}
+
+.designer-info h2, .designer-info .about-designer {
+    background-color: white;
+    padding-left: 20px;
+    padding-top: 15px;
+    padding-bottom: 15px;
+}
+
+.designer-info h2 {
+    font-size: 1.5rem;
+}
+
+.designer-info .about-designer h3 {
+    margin: 0;
+    padding: 0;
+}
+
+.designer-info .about-designer section {
+    /* padding-top: 10px; */
+    padding-bottom: 10px;
+}
+
+.designer-info header {
+    margin-bottom: 20px;
+}
+
+
 
 
