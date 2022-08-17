@@ -7,6 +7,7 @@ import { markerSplitV3 } from "./markerSplit.js";
 import { getDistanceBetweenTwoPoints } from "./geometry/getDistanceBetweenTwoPoints.js";
 import { getSlopeGivenTwoPoints } from "./geometry/getSlopeGivenTwoPoints.js";
 import { getPointsOnSameSlope } from "./geometry/getPointsOnSameSlopeAndCertainDistanceAway.js";
+import { designerInfo } from "./components/designerInfo.js";
 (() => {
     'use strict';
     const model = {
@@ -180,14 +181,7 @@ import { getPointsOnSameSlope } from "./geometry/getPointsOnSameSlopeAndCertainD
                         )
                         
                         // marker.bindPopup(`<p>${group.people[0].name}</p>`);
-                        .bindPopup(`
-                            <div>
-                                <h2>${group.people[0].name}</h2>
-                                <section>
-                                    
-                                </section>
-                            </div>
-                        `, 
+                        .bindPopup(designerInfo(group.people[0].name), 
                         {
                             maxHeight: 300,
                             className: "designer-info"
@@ -228,7 +222,7 @@ import { getPointsOnSameSlope } from "./geometry/getPointsOnSameSlopeAndCertainD
                                         fillOpacity: 1
                                     }
                                 )
-                                .bindPopup(`<p></p>`, 
+                                .bindPopup(designerInfo(subBubble.name), 
                                 {
                                     maxHeight: 300,
                                     className: "designer-info"
@@ -258,7 +252,6 @@ import { getPointsOnSameSlope } from "./geometry/getPointsOnSameSlopeAndCertainD
                                     if (group.members.length != groupAtZoomLevel.members.length || groupAtZoomLevel.split) {
                                         // console.log("splits at", zoomLevel);
                                         levelToZoomTo = zoomLevel;
-                                        // mapManager.map
                                         break;
                                     }
                                 }   
