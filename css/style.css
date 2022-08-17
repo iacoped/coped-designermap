@@ -4,16 +4,14 @@
 /* https://alvarotrigo.com/blog/how-to-create-websites-fullscreen-sections-html-and-css/ */
 html,
 body {
-  margin: 0;
-  height: 100%;
-  width: 100%;
+    margin: 0;
+    height: 100%;
+    width: 100%;
 }
-
 
 #map { 
     height: 100vh;
     z-index: 0;
-    /* width: 100vw; */
 }
 
 #info-panel {
@@ -28,9 +26,28 @@ body {
     opacity: 90%;
 }
 
-.map-popup-1 .leaflet-popup-content-wrapper {
-    background-color: blue;
-    
+@font-face {
+    font-family: dinRegular;
+    src: url("../assets/fonts/DINRegular.ttf");
+}
+
+@font-face {
+    font-family: dinRoundPro;
+    src: url("../assets/fonts/DINRoundPro.otf");
+}
+
+@font-face {
+    font-family: dinRoundPro;
+    src: url("../assets/fonts/DINRoundPro-Bold.otf");
+    font-weight: bold;
+}
+
+.designer-info .leaflet-popup-content-wrapper {
+    font-size: 36px;
+    font-family: dinRoundPro;
+    font-weight: bold;
+    background-color: white;
+    color: #2596BE;
 }
 
 .map-popup-2 .leaflet-popup-content-wrapper, .map-popup-2 .leaflet-popup-tip {

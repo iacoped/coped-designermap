@@ -178,8 +178,20 @@ import { getPointsOnSameSlope } from "./geometry/getPointsOnSameSlopeAndCertainD
                                 fillOpacity: 1
                             }
                         )
-
-                        marker.bindPopup(`<p>${group.people[0].name}</p>`);
+                        
+                        // marker.bindPopup(`<p>${group.people[0].name}</p>`);
+                        .bindPopup(`
+                            <div>
+                                <h2>${group.people[0].name}</h2>
+                                <section>
+                                    
+                                </section>
+                            </div>
+                        `, 
+                        {
+                            maxHeight: 300,
+                            className: "designer-info"
+                        })
                         this.markerDOMEles.push(marker);
                         marker.addTo(mapManager.map);
                     } else {
@@ -216,7 +228,11 @@ import { getPointsOnSameSlope } from "./geometry/getPointsOnSameSlopeAndCertainD
                                         fillOpacity: 1
                                     }
                                 )
-                                marker.bindPopup(`<p>${subBubble.name}</p>`);
+                                .bindPopup(`<p></p>`, 
+                                {
+                                    maxHeight: 300,
+                                    className: "designer-info"
+                                })
                                 this.markerDOMEles.push(marker);
                                 marker.addTo(mapManager.map);
                             }
