@@ -1,22 +1,12 @@
 // Protip: https://stackoverflow.com/questions/23429203/weird-behavior-with-objects-console-log
 // import {csv} from "https://cdn.skypack.dev/d3-fetch@3"; // import just d3's csv capabilities without loading entire library
 
-import { 
-    markerMergeV1, 
-    markerMergeV2, 
-    markerMergeV3, 
-    markerMergeV4, 
-    markerMergeV5, 
-    markerMergeV6, 
-    markerMergeV7,
-    markerMergeV8
-} from "./markerMerge.js";
+import { markerMergeV8 } from "./markerMerge.js";
 import { fetchJson } from "./ajax/fetchJson.js";
-import { markerSplitV1, markerSplitV2, markerSplitV3 } from "./markerSplit.js";
+import { markerSplitV3 } from "./markerSplit.js";
 import { getDistanceBetweenTwoPoints } from "./geometry/getDistanceBetweenTwoPoints.js";
 import { getSlopeGivenTwoPoints } from "./geometry/getSlopeGivenTwoPoints.js";
 import { getPointsOnSameSlope } from "./geometry/getPointsOnSameSlopeAndCertainDistanceAway.js";
-// import { twoCirclesOverlap } from "./geometry/getTwoCirclesIntersectionInfo.js";
 (() => {
     'use strict';
     const model = {
@@ -145,7 +135,8 @@ import { getPointsOnSameSlope } from "./geometry/getPointsOnSameSlopeAndCertainD
 
     const markerManager = {
         markerDOMEles: [],
-
+        singlePersonColor: "#7a7a89",
+        multiplePersonColor: "#2596BE",
         markersToRenderAtEachZoomLevel: {},
 
         referencePoint: {
@@ -180,10 +171,11 @@ import { getPointsOnSameSlope } from "./geometry/getPointsOnSameSlopeAndCertainD
                         let marker = new L.circleMarker(
                             mapManager.map.containerPointToLatLng(markerCoords),
                             {
-                                color: "blue",
+                                fillColor: this.singlePersonColor,
+                                color: "white",
+                                weight: 1,
                                 radius: group.radius,
-                                stroke: false,
-                                fillOpacity: 0.5
+                                fillOpacity: 1
                             }
                         )
 
@@ -193,20 +185,20 @@ import { getPointsOnSameSlope } from "./geometry/getPointsOnSameSlopeAndCertainD
                     } else {
                         if (group.split) {
                             // shows the circle that was used to generate the split markers.
-                            if (true) {
-                                let marker = new L.circleMarker(
-                                    mapManager.map.containerPointToLatLng(markerCoords),
-                                    {
-                                        color: "#FF5710",
-                                        radius: group.radius,
-                                        stroke: false,
-                                        fillOpacity: 0.9
-                                    }
-                                )
-                                this.markerDOMEles.push(marker);
-                                marker.bindPopup(`<p>${group.people.length}</p>`);
-                                marker.addTo(mapManager.map);
-                            }
+                            // if (true) {
+                            //     let marker = new L.circleMarker(
+                            //         mapManager.map.containerPointToLatLng(markerCoords),
+                            //         {
+                            //             color: "#FF5710",
+                            //             radius: group.radius,
+                            //             stroke: false,
+                            //             fillOpacity: 0.9
+                            //         }
+                            //     )
+                            //     this.markerDOMEles.push(marker);
+                            //     marker.bindPopup(`<p>${group.people.length}</p>`);
+                            //     marker.addTo(mapManager.map);
+                            // }
                             
                             for (let subBubble of group.splitBubbles) {
                                 let subBubbleCoords = JSON.parse(JSON.stringify(subBubble.coords));
@@ -217,10 +209,11 @@ import { getPointsOnSameSlope } from "./geometry/getPointsOnSameSlopeAndCertainD
                                 let marker = new L.circleMarker(
                                     mapManager.map.containerPointToLatLng(subBubbleCoords),
                                     {
-                                        color: "blue",
+                                        fillColor: this.singlePersonColor,
+                                        color: "white",
+                                        weight: 1,
                                         radius: subBubble.radius,
-                                        stroke: false,
-                                        fillOpacity: 0.5
+                                        fillOpacity: 1
                                     }
                                 )
                                 marker.bindPopup(`<p>${subBubble.name}</p>`);
@@ -232,10 +225,10 @@ import { getPointsOnSameSlope } from "./geometry/getPointsOnSameSlopeAndCertainD
                             let marker = new L.circleMarker(
                                 mapManager.map.containerPointToLatLng(markerCoords),
                                 {
-                                    color: "#FF5710",
-                                    radius: group.radius,
+                                    fillColor: this.multiplePersonColor,
                                     stroke: false,
-                                    fillOpacity: 0.9
+                                    radius: group.radius,
+                                    fillOpacity: 1
                                 }
                             )
 
