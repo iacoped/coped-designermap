@@ -69,7 +69,7 @@ import { getPointsOnSameSlope } from "./geometry/getPointsOnSameSlopeAndCertainD
             this.map.createPane('fallbackPane'); // rename later
             this.map.getPane('fallbackPane').style.zIndex = 0;
 
-            const landGeoJSON = await fetchJson("data/countries.geo.json");
+            const landGeoJSON = await fetchJson("./data/countries.geo.json");
             const countriesLayer = L.geoJson(landGeoJSON, { // initialize layer with data
                 pane: 'fallbackPane',
                 style: {
@@ -82,7 +82,7 @@ import { getPointsOnSameSlope } from "./geometry/getPointsOnSameSlopeAndCertainD
 
             countriesLayer.addTo(this.map);
 
-            const waterGeoJSON = await fetchJson("data/earth-waterbodies.geo.json");
+            const waterGeoJSON = await fetchJson("./data/earth-waterbodies.geo.json");
             const bodiesOfWaterLayer = L.geoJson(waterGeoJSON, { // initialize layer with data
                 pane: 'fallbackPane',
                 style: {
