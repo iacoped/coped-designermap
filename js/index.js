@@ -7,7 +7,7 @@ import { markerSplitV3 } from "./markerSplit.js";
 import { getDistanceBetweenTwoPoints } from "./geometry/getDistanceBetweenTwoPoints.js";
 import { getSlopeGivenTwoPoints } from "./geometry/getSlopeGivenTwoPoints.js";
 import { getPointsOnSameSlope } from "./geometry/getPointsOnSameSlopeAndCertainDistanceAway.js";
-import { designerInfo } from "./components/designerInfo.js";
+import { designerInfoHTML } from "./components/designerInfo.js";
 (() => {
     'use strict';
     const model = {
@@ -179,13 +179,16 @@ import { designerInfo } from "./components/designerInfo.js";
                                 fillOpacity: 1
                             }
                         )
-                        
-                        // marker.bindPopup(`<p>${group.people[0].name}</p>`);
-                        .bindPopup(designerInfo(group.people[0].name), 
+                        .bindPopup(designerInfoHTML(group.people[0]), 
                         {
                             maxHeight: 300,
                             className: "designer-info"
-                        })
+                        });
+
+                        marker.on("click", () => {
+                            console.log(group);
+                        });
+
                         this.markerDOMEles.push(marker);
                         marker.addTo(mapManager.map);
                     } else {
@@ -222,11 +225,15 @@ import { designerInfo } from "./components/designerInfo.js";
                                         fillOpacity: 1
                                     }
                                 )
-                                .bindPopup(designerInfo(subBubble.name), 
+                                .bindPopup(designerInfoHTML(subBubble), 
                                 {
                                     maxHeight: 300,
                                     className: "designer-info"
-                                })
+                                });
+
+                                marker.on("click", () => {
+                                    console.log(JSON.parse(JSON.stringify(subBubble)))
+                                });
                                 this.markerDOMEles.push(marker);
                                 marker.addTo(mapManager.map);
                             }
@@ -392,7 +399,7 @@ import { designerInfo } from "./components/designerInfo.js";
                         }
                     }
 
-                    // if this key is already present, means it was already split at the previous zoom level.
+                    // if this key is already present, means it was already split at some lower zoom level.
                     // all that needs to be done is update the location of its child markers.
                     if (`group-${j}` in this.markersToRenderAtEachZoomLevel[zoomLevel]) {
                         const ref = this.markersToRenderAtEachZoomLevel[zoomLevel][`group-${j}`];
@@ -529,6 +536,7 @@ import { designerInfo } from "./components/designerInfo.js";
 
         async loadAndProcessDataset() {
             const data = await d3.csv("./data/CoPED advisory list 2021-1.csv", d3.autoType);
+            console.log(data);
             data.sort((a,b) => b["Number"] - a["Number"]);
 
             // group data based on latitude and longitude
@@ -547,11 +555,14 @@ import { designerInfo } from "./components/designerInfo.js";
                     // b/c multiple people could have same names, can't use that to identify which person to show info
                     id: `${latlnString}-${uniqueCoords[latlnString].people.length}`, 
                     name: datum["Full Name"],
-                    discipline: datum["Discipline"],
-                    affiliation: datum["Firm/Lab/Organization/\nCenter Name"],
-                    region: datum["Region"],
-                    aboutBlurb1: datum["notes"],
-                    aboutBlurb2: datum["Possible Speakers"]
+                    universityAffiliation: datum["University affiliation"],
+                    communityAffiliation: datum["Community Affiliation"],
+                    // discipline: datum["Discipline"],
+                    organization: datum["Firm/Lab/Organization/\nCenter Name"],
+                    links: datum["link"]
+                    // region: datum["Region"],
+                    // aboutBlurb1: datum["notes"],
+                    // aboutBlurb2: datum["Possible Speakers"]
                 })
                 
             })
