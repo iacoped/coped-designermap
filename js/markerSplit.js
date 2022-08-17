@@ -212,7 +212,7 @@ export function markerSplitV3(markers, radiusOfMarkerRepresentingOnePerson) {
         const radiusOfCircleForSplitting = (c1.radius * 2) + (c1.people.length);
         for (let j of markerKeys) {
             const c2 = markers[j];
-            if (c2.inGroup || c2.static || c1.id === c2.id) {
+            if (c2.inGroup || c1.id === c2.id) {
                 continue;
             }
             const distance = getDistanceBetweenTwoPoints(c1.coords, c2.coords);
