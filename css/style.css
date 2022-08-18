@@ -34,9 +34,9 @@ body {
 #sidebar {
     display: grid;
     grid-template-columns: 100fr;
-    grid-template-rows: 25fr 40fr 35fr;
-    grid-gap: 20px;
-    padding: 20px;
+    grid-template-rows: 20fr 40fr 40fr;
+    grid-gap: 15px;
+    padding: 15px;
     position: absolute;
     top: 0;
     right: 0;
@@ -51,11 +51,11 @@ body {
 }
 
 #sidebar section {
-    /* padding: 0; */
     margin: 0;
     grid-column-start: 1;
     grid-column-end: 1;
     background-color: white;
+    padding: 0px 15px;
 }
 
 #sidebar #logo {
@@ -67,14 +67,30 @@ body {
     grid-row-start: 2;
     grid-row-end: 2;
     font-size: 1.5em;
-    padding: 0px 15px;
+    
 }
 
 #sidebar #designer-list {
     grid-row-start: 3;
     grid-row-end: 3;
+    overflow-y: scroll;
 }
 
+#sidebar #designer-list ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+#sidebar #designer-list ul li {
+    cursor: pointer;
+    /* border: 2px red solid; */
+}
+
+#sidebar #designer-list ul li:hover {
+    /* cursor: pointer; */
+    color: white;
+    background-color: #39959A;
+}
 
 
 .designer-info .leaflet-popup-content-wrapper {

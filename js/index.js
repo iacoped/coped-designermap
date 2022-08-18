@@ -157,6 +157,23 @@ import { designerInfoHTML } from "./components/designerInfo.js";
             this.markerDOMEles = [];
         },
 
+        manuallyShowPersonPopup(personId) {
+            const currentZoomLevel = mapManager.map.getZoom();
+            const ref = this.markersToRenderAtEachZoomLevel[currentZoomLevel];
+            const keys = Object.keys(ref);
+            console.log(keys);
+            console.log(ref);
+            for (const key of keys) {
+                for (const person of ref[key].people) {
+                    if (person.id === personId) {
+                        console.log("foud")
+                        console.log(ref[key].coords)
+                        console.log(this.markerDOMEles);
+                    }
+                }
+            }
+        },
+
         // offset is only used with prediction method.
         actuallyRenderMarkersOnMap(markers, offset) {
             const markerKeys = Object.keys(markers);
@@ -186,10 +203,6 @@ import { designerInfoHTML } from "./components/designerInfo.js";
                             // maxHeight: 300,
                             closeButton: false,
                             className: "designer-info"
-                        });
-
-                        marker.on("click", () => {
-                            console.log(group);
                         });
 
                         this.markerDOMEles.push(marker);
@@ -237,9 +250,9 @@ import { designerInfoHTML } from "./components/designerInfo.js";
                                     className: "designer-info"
                                 });
 
-                                marker.on("click", () => {
-                                    console.log(JSON.parse(JSON.stringify(subBubble)))
-                                });
+                                // marker.on("click", () => {
+                                //     console.log(JSON.parse(JSON.stringify(subBubble)))
+                                // });
                                 this.markerDOMEles.push(marker);
                                 marker.addTo(mapManager.map);
                             }
@@ -477,35 +490,21 @@ import { designerInfoHTML } from "./components/designerInfo.js";
 
     const controlPanelView = {
         init() {
-            // this.regionDOMEle = document.querySelector("#region");
-            // this.dropdownDOMEle = document.querySelector("#people");
-            // this.dropdownDOMEle.addEventListener("change", (e) => {
-            //     const data = controller.getSelectedMarkerData();
-            //     // match person 
-            //     let index = null;
-            //     for (let i = 0; i < data.people.length; i++) {
-            //         if (e.target.value === data.people[i].id) {
-            //             index = i;
-            //             console.log("found")
-            //             break;
-            //         }
-            //     }
-            //     document.querySelector("#designer-info h2").innerHTML = data.people[index].name;
-            //     document.querySelector("#designer-discipline p").innerHTML = data.people[index].discipline;
-            //     document.querySelector("#designer-affiliation p").innerHTML = data.people[index].affiliation;
-            //     document.querySelector("#designer-description #about-blurb-1").innerHTML = data.people[index].aboutBlurb1;
-            //     document.querySelector("#designer-description #about-blurb-2").innerHTML = data.people[index].aboutBlurb2;
-            // })
-            // const radioButtons = document.querySelectorAll('input[name="marker-view-mode"]');
-            // for (const radioButton of radioButtons) {
-            //     radioButton.addEventListener("click", () => {
-            //         if (radioButton.checked) {
-            //             controller.setMarkerViewMode(radioButton.value);
-            //         }
-            //     });
-            // }
-            
-            this.render();
+            const listDOMEle = document.querySelector("#designer-list ul");
+            const data = controller.getPeopleData();
+            const keys = Object.keys(data);
+
+            for (const key of keys) {
+                const people = data[key].people;
+                for (const person of people) {
+                    let listItemDOMEle = document.createElement("li");
+                    listItemDOMEle.textContent = person.name;
+                    listItemDOMEle.addEventListener("click", () => {
+                        markerManager.manuallyShowPersonPopup(person.id);
+                    });
+                    listDOMEle.appendChild(listItemDOMEle);
+                }
+            }
         },
 
         render() {
