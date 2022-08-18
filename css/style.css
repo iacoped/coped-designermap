@@ -1,29 +1,6 @@
 * {
     box-sizing: border-box;
 }
-/* https://alvarotrigo.com/blog/how-to-create-websites-fullscreen-sections-html-and-css/ */
-html,
-body {
-    margin: 0;
-    height: 100%;
-    width: 100%;
-}
-
-#map { 
-    height: 100vh;
-    z-index: 0;
-}
-
-#sidebar {
-    position: absolute;
-    top: 0;
-    right: 0;
-    z-index: 1;
-    background-color: #39959A;
-    height: 100vh;
-    /* width: 17vw; */
-    width: 300px;
-}
 
 @font-face {
     font-family: dinRegular;
@@ -40,6 +17,65 @@ body {
     src: url("../assets/fonts/DINRoundPro-Bold.otf");
     font-weight: bold;
 }
+
+/* https://alvarotrigo.com/blog/how-to-create-websites-fullscreen-sections-html-and-css/ */
+html,
+body {
+    margin: 0;
+    height: 100%;
+    width: 100%;
+}
+
+#map { 
+    height: 100vh;
+    z-index: 0;
+}
+
+#sidebar {
+    display: grid;
+    grid-template-columns: 100fr;
+    grid-template-rows: 25fr 40fr 35fr;
+    grid-gap: 20px;
+    padding: 20px;
+    position: absolute;
+    top: 0;
+    right: 0;
+    z-index: 1;
+    background-color: #39959A;
+    height: 100vh;
+    /* width: 17vw; */
+    color: #39959A;
+    font-family: dinRegular;
+    width: 300px;
+    justify-items: stretch;
+}
+
+#sidebar section {
+    /* padding: 0; */
+    margin: 0;
+    grid-column-start: 1;
+    grid-column-end: 1;
+    background-color: white;
+}
+
+#sidebar #logo {
+    grid-row-start: 1;
+    grid-row-end: 1;
+}
+
+#sidebar #about-map {
+    grid-row-start: 2;
+    grid-row-end: 2;
+    font-size: 1.5em;
+    padding: 0px 15px;
+}
+
+#sidebar #designer-list {
+    grid-row-start: 3;
+    grid-row-end: 3;
+}
+
+
 
 .designer-info .leaflet-popup-content-wrapper {
     font-family: dinRoundPro;
