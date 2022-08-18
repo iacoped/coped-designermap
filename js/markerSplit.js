@@ -268,6 +268,7 @@ export function markerSplitV3(markers, radiusOfMarkerRepresentingOnePerson) {
                     break
                 } else {
                     splitBubbles.push({
+                        id: person.id,
                         name: person.name,
                         universityAffiliation: person.universityAffiliation,
                         communityAffiliation: person.communityAffiliation,

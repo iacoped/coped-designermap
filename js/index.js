@@ -139,6 +139,7 @@ import { designerInfoHTML } from "./components/designerInfo.js";
         singlePersonColor: "#7a7a89",
         multiplePersonColor: "#39959A",
         markersToRenderAtEachZoomLevel: {},
+        popupCreatedFromClickingOnListItem: null,
 
         referencePoint: {
             posInLatLng: new L.LatLng(100, -40),
@@ -157,19 +158,37 @@ import { designerInfoHTML } from "./components/designerInfo.js";
             this.markerDOMEles = [];
         },
 
-        manuallyShowPersonPopup(personId) {
-            const currentZoomLevel = mapManager.map.getZoom();
-            const ref = this.markersToRenderAtEachZoomLevel[currentZoomLevel];
-            const keys = Object.keys(ref);
-            console.log(keys);
-            console.log(ref);
-            for (const key of keys) {
-                for (const person of ref[key].people) {
-                    if (person.id === personId) {
-                        console.log("foud")
-                        console.log(ref[key].coords)
-                        console.log(this.markerDOMEles);
+        manuallyShowPersonPopup(personToShowInfo) {
+            // const currentZoomLevel = mapManager.map.getZoom();
+            // const ref = this.markersToRenderAtEachZoomLevel[currentZoomLevel];
+            // const keys = Object.keys(ref);
+            for (const markerDOMEle of this.markerDOMEles) {
+                // console.log(markerDOMEle);
+                // console.log(markerDOMEle.options.people);
+                for (const person of markerDOMEle.options.people) {
+                    if (person.id === personToShowInfo.id) {
+    
+                        // if marker doesn't have popup (means it's representing multiple people, create one)
+                        if (!markerDOMEle.getPopup()) {
+                            this.popupCreatedFromClickingOnListItem = L.popup({
+                                className: "designer-info"
+                            })
+                            .setLatLng(markerDOMEle.getLatLng())
+                            .setContent(designerInfoHTML(personToShowInfo))
+                            .openOn(mapManager.map);
+                        } else {
+                            markerDOMEle.openPopup();
+                        }
+                        // console.log(markerDOMEle.getPopup());
+                        // let popup = L.popup({
+                        //     className: "designer-info"
+                        // })
+                        // .setLatLng(markerDOMEle.getLatLng())
+                        // .setContent(designerInfoHTML(personToShowInfo))
+                        // .openOn(mapManager.map);
+                        // markerDOMEle.setStyle({fillColor: "black"});
                     }
+                    
                 }
             }
         },
@@ -193,7 +212,8 @@ import { designerInfoHTML } from "./components/designerInfo.js";
                                 color: "white",
                                 weight: 1,
                                 radius: group.radius,
-                                fillOpacity: 1
+                                fillOpacity: 1,
+                                people: group.people
                             }
                         )
                         .bindPopup(designerInfoHTML(group.people[0]), 
@@ -238,7 +258,8 @@ import { designerInfoHTML } from "./components/designerInfo.js";
                                         color: "white",
                                         weight: 1,
                                         radius: subBubble.radius,
-                                        fillOpacity: 1
+                                        fillOpacity: 1,
+                                        people: [subBubble]
                                     }
                                 )
                                 .bindPopup(designerInfoHTML(subBubble), 
@@ -264,11 +285,11 @@ import { designerInfoHTML } from "./components/designerInfo.js";
                                     fillColor: this.multiplePersonColor,
                                     stroke: false,
                                     radius: group.radius,
-                                    fillOpacity: 1
+                                    fillOpacity: 1,
+                                    people: group.people
                                 }
                             )
 
-                            // marker.bindPopup(`<p>${group.people.length}</p>`);
                             // do the zooming 
                             marker.on("click", (e) => {
                                 let levelToZoomTo = null;
@@ -293,6 +314,10 @@ import { designerInfoHTML } from "./components/designerInfo.js";
         },
 
         renderMarkers() {
+            if (this.popupCreatedFromClickingOnListItem) {
+                this.popupCreatedFromClickingOnListItem.remove();
+                this.popupCreatedFromClickingOnListItem = null;
+            }
             this.removeMarkersFromMap();
             const currentZoomLevel = mapManager.map.getZoom();
             // the location of the reference point relative to the container will be different from its position on startup.
@@ -499,8 +524,9 @@ import { designerInfoHTML } from "./components/designerInfo.js";
                 for (const person of people) {
                     let listItemDOMEle = document.createElement("li");
                     listItemDOMEle.textContent = person.name;
+                    // maybe highlight the marker on hover over person's name?
                     listItemDOMEle.addEventListener("click", () => {
-                        markerManager.manuallyShowPersonPopup(person.id);
+                        markerManager.manuallyShowPersonPopup(person);
                     });
                     listDOMEle.appendChild(listItemDOMEle);
                 }
