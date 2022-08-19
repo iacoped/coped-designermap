@@ -1,8 +1,8 @@
-import { getDistanceBetweenTwoPoints } from "./geometry/getDistanceBetweenTwoPoints.js";
-import { getTwoCirclesIntersectionInfo } from "./geometry/getTwoCirclesIntersectionInfo.js";
-import { getSlopeGivenTwoPoints } from "./geometry/getSlopeGivenTwoPoints.js";
-import { getPointsOnSameSlope } from "./geometry/getPointsOnSameSlopeAndCertainDistanceAway.js";
-import { getMidpoint } from "./geometry/getMidpoint.js";
+import { getDistanceBetweenTwoPoints } from "../utils/geometry/getDistanceBetweenTwoPoints.js";
+import { getTwoCirclesIntersectionInfo } from "../utils/geometry/getTwoCirclesIntersectionInfo.js";
+import { getSlopeGivenTwoPoints } from "../utils/geometry/getSlopeGivenTwoPoints.js";
+import { getPointsOnSameSlope } from "../utils/geometry/getPointsOnSameSlopeAndCertainDistanceAway.js";
+import { getMidpoint } from "../utils/geometry/getMidpoint.js";
 
 export function markerMergeV8(markers) {
     // While intersections still exist:

@@ -1,19 +1,19 @@
 // Protip: https://stackoverflow.com/questions/23429203/weird-behavior-with-objects-console-log
 // import {csv} from "https://cdn.skypack.dev/d3-fetch@3"; // import just d3's csv capabilities without loading entire library
 
-import { markerMergeV8 } from "./markerMerge.js";
-import { fetchJson } from "./ajax/fetchJson.js";
-import { markerSplitV3 } from "./markerSplit.js";
-import { getDistanceBetweenTwoPoints } from "./geometry/getDistanceBetweenTwoPoints.js";
-import { getSlopeGivenTwoPoints } from "./geometry/getSlopeGivenTwoPoints.js";
-import { getPointsOnSameSlope } from "./geometry/getPointsOnSameSlopeAndCertainDistanceAway.js";
+import { markerMergeV8 } from "./clusterAlgorithms/markerMerge.js";
+import { markerSplitV3 } from "./clusterAlgorithms/markerSplit.js";
+import { fetchJson } from "./utils/ajax/fetchJson.js";
+import { createDeepCopy } from "./utils/core/createDeepCopy.js";
+import { getDistanceBetweenTwoPoints } from "./utils/geometry/getDistanceBetweenTwoPoints.js";
+import { getSlopeGivenTwoPoints } from "./utils/geometry/getSlopeGivenTwoPoints.js";
+import { getPointsOnSameSlope } from "./utils/geometry/getPointsOnSameSlopeAndCertainDistanceAway.js";
 import { designerInfoHTML } from "./components/designerInfo.js";
 (() => {
     'use strict';
     const model = {
         data: null,
         selectedMarkerData: null,
-        markerViewMode: "overlap-real-time"
     }
 
     // perhaps I will combine mapManager and markerManager into mapView since markers are on the mapview
@@ -173,7 +173,7 @@ import { designerInfoHTML } from "./components/designerInfo.js";
                 const group = markers[i];
 
                 if (!group.inGroup) {
-                    let markerCoords = JSON.parse(JSON.stringify(group.coords));
+                    let markerCoords = createDeepCopy(group.coords);
 
                     markerCoords.x += offset.xShiftAmount;
                     markerCoords.y += offset.yShiftAmount;
@@ -219,8 +219,7 @@ import { designerInfoHTML } from "./components/designerInfo.js";
                             // }
                             
                             for (let subBubble of group.splitBubbles) {
-                                let subBubbleCoords = JSON.parse(JSON.stringify(subBubble.coords));
-
+                                let subBubbleCoords = createDeepCopy(subBubble.coords);
                                 subBubbleCoords.x += offset.xShiftAmount;
                                 subBubbleCoords.y += offset.yShiftAmount;
 
@@ -384,7 +383,7 @@ import { designerInfoHTML } from "./components/designerInfo.js";
                     } else {
                         switch (referenceInfo[j].directionToPlaceMarkerRelativeToReferencePoint) {
                             case ("none"): // marker is right on top of refPoint (very unlikely)
-                                markerCoordsInPx = JSON.parse(JSON.stringify(refPointInPxCoords));
+                                markerCoordsInPx = createDeepCopy(refPointInPxCoords);
                                 break;
                             case ("to its left"):
                                 markerCoordsInPx = {
@@ -463,7 +462,7 @@ import { designerInfoHTML } from "./components/designerInfo.js";
                     if (this.markersToRenderAtEachZoomLevel[zoomLevel][key].static && !this.markersToRenderAtEachZoomLevel[zoomLevel][key].inGroup) {
                         for (let zoom = zoomLevel + 1; zoom <= mapManager.maxZoom; zoom++) { 
                             // console.log(this.markersToRenderAtEachZoomLevel[zoomLevel][key]);
-                            this.markersToRenderAtEachZoomLevel[zoom][key] = JSON.parse(JSON.stringify(this.markersToRenderAtEachZoomLevel[zoomLevel][key]));
+                            this.markersToRenderAtEachZoomLevel[zoom][key] = createDeepCopy(this.markersToRenderAtEachZoomLevel[zoomLevel][key]);
                             const ref = this.markersToRenderAtEachZoomLevel[zoom][key];
                             ref.zoomLevelAtSplit = zoomLevel;
 
@@ -509,29 +508,6 @@ import { designerInfoHTML } from "./components/designerInfo.js";
                 }
             }
         },
-
-        render() {
-            // const data = controller.getSelectedMarkerData();
-            // this.dropdownDOMEle.innerHTML = "";
-            // if (!data) {
-            //     this.dropdownDOMEle.innerHTML = `<option value="" disabled selected>No location selected</option>`;
-            // } else {
-            //     // only implemented in merge mode currently
-            //     if (data.mostCommonRegion) {
-            //         this.regionDOMEle.innerHTML = data.mostCommonRegion;
-            //     }
-            //     this.dropdownDOMEle.innerHTML = `<option value="" disabled selected>Select a designer</option>`;
-            //     // <option value="" disabled selected>Select your option</option>
-            //     for (let j = 0; j < data.people.length; j++) {
-            //         const person = data.people[j];
-            //         let optionDOMEle = document.createElement("option");
-            //         optionDOMEle.value = `${person.id}`;
-            //         optionDOMEle.textContent = person.name;
-            //         this.dropdownDOMEle.appendChild(optionDOMEle);
-            //     }
-            // }
-            
-        }
     }
 
     const controller = {

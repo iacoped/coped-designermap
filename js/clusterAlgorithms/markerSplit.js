@@ -1,6 +1,6 @@
-import { getRandCoordsWithinCircle } from "./geometry/getRandCoordsWithinCircle.js";
-import { getDistanceBetweenTwoPoints } from "./geometry/getDistanceBetweenTwoPoints.js";
-import { getTwoCirclesIntersectionInfo } from "./geometry/getTwoCirclesIntersectionInfo.js";
+import { getRandCoordsWithinCircle } from "../utils/geometry/getRandCoordsWithinCircle.js";
+import { getDistanceBetweenTwoPoints } from "../utils/geometry/getDistanceBetweenTwoPoints.js";
+import { getTwoCirclesIntersectionInfo } from "../utils/geometry/getTwoCirclesIntersectionInfo.js";
 /** 
 * splits a marker representing N indiviudals into N markers each representing 1 individual.
 * @summary If the description is long, write your summary here. Otherwise, feel free to remove this.
