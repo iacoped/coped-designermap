@@ -56,11 +56,21 @@ body {
     grid-column-end: 1;
     background-color: white;
     padding: 0px 15px;
+    display: flex;
+    justify-content: center;
 }
 
 #sidebar #logo {
+    padding: 5px;
     grid-row-start: 1;
     grid-row-end: 1;
+    
+}
+
+#sidebar img {
+    /* border: 2px red solid; */
+    max-width: 225px;
+
 }
 
 #sidebar #about-map {
