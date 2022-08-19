@@ -20,7 +20,6 @@ import { designerInfoHTML } from "./components/designerInfo.js";
     const mapManager = {
         minZoom: 3, 
         maxZoom: 12,
-        currentZoomLevel: null,
         async init() {
             this.map = L.map('map', {
                 preferCanvas: true,
@@ -30,12 +29,11 @@ import { designerInfoHTML } from "./components/designerInfo.js";
                     [-90, -180],
                     [90, 180]
                 ],
-                // maxZoom: 15
-                maxBoundsViscosity: 1.0
+                maxBoundsViscosity: 1.0,
             }
             ).setView([37.439974, -15.117188], 3);
             
-            this.currentZoomLevel = this.map.getZoom();
+     
 
             // for alternative providers: https://leaflet-extras.github.io/leaflet-providers/preview/
             L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/toner-background/{z}/{x}/{y}{r}.png', {
@@ -48,10 +46,15 @@ import { designerInfoHTML } from "./components/designerInfo.js";
                     [-90, -180],
                     [90, 180]
                 ],
-                attribution: '© OpenStreetMap'
             })
             .addTo(this.map);
-        
+            
+            L.control.attribution({
+                position: 'bottomleft'
+            })
+            .addAttribution(`Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors`)
+            .addTo(this.map);
+
             // https://gis.stackexchange.com/questions/380874/leaflet-draw-vector-layer-behind-tile-layer
             // https://leafletjs.com/examples/map-panes/
             // allows us to display the geoJSON layer behind the tile layer, so if a tile can't be loaded, the geoJSON is shown.
