@@ -32,12 +32,8 @@ import { designerInfoHTML } from "./components/designerInfo.js";
             ).setView([37.439974, -15.117188], 3);
             
             this.currentZoomLevel = this.map.getZoom();
-            // https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}{r}.png
-            // https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png
-            // https://stamen-tiles-{s}.a.ssl.fastly.net/toner-background/{z}/{x}/{y}{r}.{ext}
-            // ^^^ this one has nice black and white scheme as required, but looks like tiles aren't available
-            // once you get to zoom level ~3, throws bunch of errors in console.
 
+            // https://leaflet-extras.github.io/leaflet-providers/preview/
             const blackWhiteMap = L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/toner-background/{z}/{x}/{y}{r}.png', {
                 maxZoom: this.maxZoom,
                 minZoom: this.minZoom,
@@ -96,29 +92,6 @@ import { designerInfoHTML } from "./components/designerInfo.js";
 
             bodiesOfWaterLayer.addTo(this.map);
 
-            // let mrker = L.marker([0, -121.74])
-            //     .addTo(this.map)
-            //     .bindPopup(
-            //         `
-            //             <img src="./assets/images/DavisAmtrak.PNG" height="200" width="275">
-            //             <p>During the Spring Quarter of 2019 my Human-Centered Design class at UC Davis
-            //             worked with the city of Davis, CA to reimagine the Amtrak station and the surrounding
-            //             areas. I developed the project with Rachel Hartsough, the Arts and Culture Manager
-            //             for the City of Davis with the aim of supporting a larger study by the city to explore
-            //             ways to improve the station, decrease traffic congestion and encourage biking and
-            //             public transportation to and from the station. Utilizing a human-centered approach
-            //             to the challenge, the class interviewed potential users, developed a unique frame on
-            //             the challenge, then developed concepts, prototyped the ideas, tested them, and then
-            //             finally, presented their findings to a group of consultants and city officials at Davis City
-            //             Hall.</p>
-            //         `, 
-                
-                
-            //     {
-            //         maxHeight: 300,
-            //         className: "map-popup-2"
-
-            //     })
             
             // firing only on zoomend prevents constant re-rendering when zooming on mobile (plus it looks bad)
             // pixel distance between markers changes by factor of 2 on zoom (assuming zoom level changes by 1 each zoom)
@@ -271,9 +244,6 @@ import { designerInfoHTML } from "./components/designerInfo.js";
                                     className: "designer-info"
                                 });
 
-                                // marker.on("click", () => {
-                                //     console.log(JSON.parse(JSON.stringify(subBubble)))
-                                // });
                                 this.markerDOMEles.push(marker);
                                 marker.addTo(mapManager.map);
                             }
@@ -480,6 +450,13 @@ import { designerInfoHTML } from "./components/designerInfo.js";
                 this.markersToRenderAtEachZoomLevel[zoomLevel] = markerMergeV8(this.markersToRenderAtEachZoomLevel[zoomLevel]);
                 this.markersToRenderAtEachZoomLevel[zoomLevel] = markerSplitV3(this.markersToRenderAtEachZoomLevel[zoomLevel], radiusOfMarkerRepresentingOnePerson);
 
+                /* 
+                    To be visually consistent, circle that has already split into multiple markers at a 
+                    certain zoom level should not merge back at higher zoom levels. As you zoom in more and more,
+                    visual distance between latitude/longitudes (and thus marker positions) increases, so there is more
+                    physical space to split markers into single individual rep markers. So the info
+                    should get more and more specific as you zoom in more. 
+                */
                 // if a marker is "split" and shows all info at a zoom level, its state stays the same at all higher zoom levels
                 const keys = Object.keys(this.markersToRenderAtEachZoomLevel[zoomLevel]);
                 for (let key of keys) {
