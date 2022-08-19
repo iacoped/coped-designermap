@@ -41,10 +41,10 @@ body {
     top: 0;
     right: 0;
     z-index: 1;
-    background-color: #39959A;
+    background-color: #31939B;
     height: 100vh;
     /* width: 17vw; */
-    color: #39959A;
+    color: #31939B;
     font-family: dinRegular;
     width: 300px;
     justify-items: stretch;
@@ -99,20 +99,20 @@ body {
 #sidebar #designer-list ul li:hover {
     /* cursor: pointer; */
     color: white;
-    background-color: #39959A;
+    background-color: #31939B;
 }
 
 
 .designer-info .leaflet-popup-content-wrapper {
     font-family: dinRoundPro;
     font-weight: bold;
-    background-color: #39959A;
+    background-color: #31939B;
     color: #39959A;
     border-radius: 0px;
 }
 
 .designer-info .leaflet-popup-tip {
-    background-color: #39959A;
+    background-color: #31939B;
 }
 
 .designer-info h2, .designer-info .about-designer {
