@@ -12,7 +12,7 @@ import { getTwoCirclesIntersectionInfo } from "./geometry/getTwoCirclesIntersect
 // else, for markers who rep N > 1 person, split them into N markers reping 1 person if: 
 // radius x 2 circle doesn't intersect with any markers?
 
-export function markerSplitV3(markers, radiusOfMarkerRepresentingOnePerson) {
+export function markerSplitV3(markers, radiusOfMarkerRepresentingOnePerson, seededRNG) {
     // let splitMarkers = [];
     const markerKeys = Object.keys(markers);
     for (let i of markerKeys) {
@@ -65,7 +65,7 @@ export function markerSplitV3(markers, radiusOfMarkerRepresentingOnePerson) {
                 // coordinate of split bubble cannot result in overlap with another bubble
                 while (coordRejected && tries != 1000) {
                     // coord is within a circle that has radius of original merged marker's radius * 2
-                    rand = getRandCoordsWithinCircle(c1.coords, radiusOfCircleForSplitting, false);
+                    rand = getRandCoordsWithinCircle(c1.coords, radiusOfCircleForSplitting, false, seededRNG);
                     coordRejected = false;
                     for (let bubble of splitBubbles) {
                         const distance = getDistanceBetweenTwoPoints(bubble.coords, rand);

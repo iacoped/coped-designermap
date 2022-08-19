@@ -113,7 +113,7 @@ import { designerInfoHTML } from "./components/designerInfo.js";
         multiplePersonColor: "#31939B",
         markersToRenderAtEachZoomLevel: {},
         popupCreatedFromClickingOnListItem: null,
-
+        seededRNG: new Math.seedrandom('hello.'),
         referencePoint: {
             posInLatLng: new L.LatLng(100, -40),
             posInPxCoordsAtStartUp: null
@@ -448,7 +448,7 @@ import { designerInfoHTML } from "./components/designerInfo.js";
                 const radiusOfMarkerRepresentingOnePerson = 1 + Math.log(zoomLevel * 100);
                 // merge markers
                 this.markersToRenderAtEachZoomLevel[zoomLevel] = markerMergeV8(this.markersToRenderAtEachZoomLevel[zoomLevel]);
-                this.markersToRenderAtEachZoomLevel[zoomLevel] = markerSplitV3(this.markersToRenderAtEachZoomLevel[zoomLevel], radiusOfMarkerRepresentingOnePerson);
+                this.markersToRenderAtEachZoomLevel[zoomLevel] = markerSplitV3(this.markersToRenderAtEachZoomLevel[zoomLevel], radiusOfMarkerRepresentingOnePerson, this.seededRNG);
 
                 /* 
                     To be visually consistent, circle that has already split into multiple markers at a 
@@ -605,6 +605,7 @@ import { designerInfoHTML } from "./components/designerInfo.js";
     }
     
     
+ 
 
     
     controller.init();

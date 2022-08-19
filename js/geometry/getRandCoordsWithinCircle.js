@@ -4,10 +4,10 @@
 * @param {ParamDataTypeHere} parameterNameHere - Brief description of the parameter here. Note: For other notations of data types, please refer to JSDocs: DataTypes command.
 * @return {ReturnValueDataTypeHere} Brief description of the returning value here.
 */
-export function getRandCoordsWithinCircle(circleCoords, circleRadius, uniform) {
+export function getRandCoordsWithinCircle(circleCoords, circleRadius, uniform, seededRNG) {
                     
-    let a = Math.random(),
-        b = Math.random();
+    let a = seededRNG(),
+        b = seededRNG();
     
     if (uniform) {
         if (b < a) {
@@ -18,7 +18,7 @@ export function getRandCoordsWithinCircle(circleCoords, circleRadius, uniform) {
     }
     
     return {
-        x: circleCoords.x + (b * circleRadius * Math.cos( 2 * Math.PI * a / b )),
-        y: circleCoords.y + (b * circleRadius * Math.sin( 2 * Math.PI * a / b ))
+        x: circleCoords.x + (b * circleRadius * Math.cos(2 * Math.PI * a / b)),
+        y: circleCoords.y + (b * circleRadius * Math.sin(2 * Math.PI * a / b))
     }
 }
