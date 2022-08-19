@@ -24,8 +24,8 @@ import { designerInfoHTML } from "./components/designerInfo.js";
         async init() {
             this.map = L.map('map', {
                 preferCanvas: true,
-                zoomSnap: 1
-                // worldCopyJump: true,
+                zoomSnap: 1,
+                worldCopyJump: true,
                 // maxZoom: 15
                 // maxBoundsViscosity: 1.0
             }
@@ -33,8 +33,8 @@ import { designerInfoHTML } from "./components/designerInfo.js";
             
             this.currentZoomLevel = this.map.getZoom();
 
-            // https://leaflet-extras.github.io/leaflet-providers/preview/
-            const blackWhiteMap = L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/toner-background/{z}/{x}/{y}{r}.png', {
+            // for alternative providers: https://leaflet-extras.github.io/leaflet-providers/preview/
+            L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/toner-background/{z}/{x}/{y}{r}.png', {
                 maxZoom: this.maxZoom,
                 minZoom: this.minZoom,
                 // errorTileUrl: '../assets/images/pexels-photo-376723-909353127.png', // fallback image when tile isn't available is just a white image
@@ -45,18 +45,6 @@ import { designerInfoHTML } from "./components/designerInfo.js";
                     [90, 180]
                 ],
                 attribution: '© OpenStreetMap'
-            })
-            // fires first
-            .on("loading", () => {
-
-            })
-            // if it occurs, fires second
-            .on("tileerror", () => {
-
-            })
-            // always fires last
-            .on("load", () => {
-                
             })
             .addTo(this.map);
         
@@ -361,7 +349,7 @@ import { designerInfoHTML } from "./components/designerInfo.js";
             let factor = 0;
             for (let zoomLevel = mapManager.minZoom; zoomLevel <= mapManager.maxZoom; zoomLevel++) {
                 for (let j = 0; j < referenceInfo.length; j++) {
-                    // px distance between markers should always increase as you zoom in
+                    // Assuming a zoomSnap value of 1 (see line 27, the visual distance between markers increases by a factor of 2 each zoom level.)
                     let newDistance = referenceInfo[j].distance * (Math.pow(2, factor));
                     let markerCoordsInPx;
                     if (referenceInfo[j].slope) {
@@ -520,7 +508,6 @@ import { designerInfoHTML } from "./components/designerInfo.js";
 
         async loadAndProcessDataset() {
             const data = await d3.csv("./data/CoPED advisory list 2021-1.csv", d3.autoType);
-            console.log(data);
             data.sort((a,b) => b["Number"] - a["Number"]);
 
             // group data based on latitude and longitude
@@ -541,12 +528,8 @@ import { designerInfoHTML } from "./components/designerInfo.js";
                     name: datum["Full Name"],
                     universityAffiliation: datum["University affiliation"],
                     communityAffiliation: datum["Community Affiliation"],
-                    // discipline: datum["Discipline"],
                     organization: datum["Firm/Lab/Organization/\nCenter Name"],
                     links: datum["link"]
-                    // region: datum["Region"],
-                    // aboutBlurb1: datum["notes"],
-                    // aboutBlurb2: datum["Possible Speakers"]
                 })
                 
             })
@@ -579,10 +562,6 @@ import { designerInfoHTML } from "./components/designerInfo.js";
             return model.markerViewMode;
         }
     }
-    
-    
- 
-
     
     controller.init();
 })();
