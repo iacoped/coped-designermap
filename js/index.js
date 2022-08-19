@@ -26,8 +26,12 @@ import { designerInfoHTML } from "./components/designerInfo.js";
                 preferCanvas: true,
                 zoomSnap: 1,
                 worldCopyJump: true,
+                maxBounds: [ // stops leaflet from requesting tiles outside map bounds (causes HTTP 400)
+                    [-90, -180],
+                    [90, 180]
+                ],
                 // maxZoom: 15
-                // maxBoundsViscosity: 1.0
+                maxBoundsViscosity: 1.0
             }
             ).setView([37.439974, -15.117188], 3);
             
@@ -38,7 +42,7 @@ import { designerInfoHTML } from "./components/designerInfo.js";
                 maxZoom: this.maxZoom,
                 minZoom: this.minZoom,
                 // errorTileUrl: '../assets/images/pexels-photo-376723-909353127.png', // fallback image when tile isn't available is just a white image
-                noWrap: true,
+                // noWrap: true,
                 // https://stackoverflow.com/questions/47477956/nowrap-option-on-tilelayer-is-only-partially-working
                 bounds: [ // stops leaflet from requesting tiles outside map bounds (causes HTTP 400)
                     [-90, -180],
