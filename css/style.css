@@ -60,17 +60,20 @@ body {
     justify-content: center;
 }
 
-#sidebar #logo {
+#sidebar #logo-container {
     padding: 5px;
     grid-row-start: 1;
     grid-row-end: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     
 }
 
 #sidebar img {
     /* border: 2px red solid; */
     max-width: 225px;
-
+    max-height: 126px;
 }
 
 #sidebar #about-map {

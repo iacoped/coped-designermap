@@ -25,10 +25,10 @@ import { designerInfoHTML } from "./components/designerInfo.js";
             this.map = L.map('map', {
                 preferCanvas: true,
                 zoomSnap: 1,
-                worldCopyJump: true,
+                // worldCopyJump: true,
                 maxBounds: [ // stops leaflet from requesting tiles outside map bounds (causes HTTP 400)
                     [-90, -180],
-                    [90, 180]
+                    [90, 270]
                 ],
                 maxBoundsViscosity: 1.0,
             }
@@ -62,7 +62,7 @@ import { designerInfoHTML } from "./components/designerInfo.js";
         },
 
         attachEventHandlersToMap() {
-            // firing only on zoomend prevents constant re-rendering when zooming on mobile (plus it looks bad)
+            // firing only on zoomend prevents constant marker re-rendering when zooming on mobile (plus it looks bad)
             this.map.on("zoomend", () => {
                 markerManager.renderMarkers();
             });
@@ -518,7 +518,7 @@ import { designerInfoHTML } from "./components/designerInfo.js";
         async init() {
             this.setPeopleData(await this.loadAndProcessDataset());
             mapManager.initializeMap(); // this MUST execute before markerManager.init()
-            mapManager.initializeGeoJSONLayers();
+            mapManager.initializeGeoJSONLayers(); // async
             markerManager.init();
             mapManager.attachEventHandlersToMap();
             controlPanelView.init();
