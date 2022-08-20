@@ -20,7 +20,8 @@ import { designerInfoHTML } from "./components/designerInfo.js";
     const mapManager = {
         minZoom: 3, 
         maxZoom: 12,
-        async init() {
+
+        initializeMap() {
             this.map = L.map('map', {
                 preferCanvas: true,
                 zoomSnap: 1,
@@ -32,10 +33,7 @@ import { designerInfoHTML } from "./components/designerInfo.js";
                 maxBoundsViscosity: 1.0,
             }
             ).setView([37.439974, -15.117188], 3);
-            
-     
 
-            // for alternative providers: https://leaflet-extras.github.io/leaflet-providers/preview/
             L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/toner-background/{z}/{x}/{y}{r}.png', {
                 maxZoom: this.maxZoom,
                 minZoom: this.minZoom,
@@ -55,12 +53,31 @@ import { designerInfoHTML } from "./components/designerInfo.js";
             .addAttribution(`Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors`)
             .addTo(this.map);
 
+            // console.log("map init done")
+            //     // sometimes grey area happens, sometimes it doesn't, this hoepfully helps it guaranteed not problem
+            //     // think the problem happens when I change the height of the map via css and live reloads the map
+            //     // this code should prevent this from happening when resizing the map in the css
+            //     //https://stackoverflow.com/questions/19564366/unwanted-gray-area-on-map
+            //     setTimeout(this.map.invalidateSize.bind(this.map));`
+        },
+
+        attachEventHandlersToMap() {
+            // firing only on zoomend prevents constant re-rendering when zooming on mobile (plus it looks bad)
+            this.map.on("zoomend", () => {
+                markerManager.renderMarkers();
+            });
+        },
+
+        // takes some time but isn't needed immediately, so I make it async
+        async initializeGeoJSONLayers() {
+            // console.log("add geojsonLayers start")
             // https://gis.stackexchange.com/questions/380874/leaflet-draw-vector-layer-behind-tile-layer
             // https://leafletjs.com/examples/map-panes/
             // allows us to display the geoJSON layer behind the tile layer, so if a tile can't be loaded, the geoJSON is shown.
-            this.map.createPane('fallbackPane'); // rename later
+            this.map.createPane('fallbackPane'); 
             this.map.getPane('fallbackPane').style.zIndex = 0;
 
+            // https://github.com/simonepri/geo-maps/blob/master/previews/earth-waterbodies.geo.json
             const landGeoJSON = await fetchJson("./data/countries.geo.json");
             const countriesLayer = L.geoJson(landGeoJSON, { // initialize layer with data
                 pane: 'fallbackPane',
@@ -74,6 +91,7 @@ import { designerInfoHTML } from "./components/designerInfo.js";
 
             countriesLayer.addTo(this.map);
 
+            // https://github.com/simonepri/geo-maps/blob/master/previews/earth-waterbodies.geo.json
             const waterGeoJSON = await fetchJson("./data/earth-waterbodies.geo.json");
             const bodiesOfWaterLayer = L.geoJson(waterGeoJSON, { // initialize layer with data
                 pane: 'fallbackPane',
@@ -87,19 +105,8 @@ import { designerInfoHTML } from "./components/designerInfo.js";
 
             bodiesOfWaterLayer.addTo(this.map);
 
-            
-            // firing only on zoomend prevents constant re-rendering when zooming on mobile (plus it looks bad)
-            // pixel distance between markers changes by factor of 2 on zoom (assuming zoom level changes by 1 each zoom)
-            this.map.on("zoomend", () => {
-                markerManager.renderMarkers();
-            });
-
-            // sometimes grey area happens, sometimes it doesn't, this hoepfully helps it guaranteed not problem
-            // think the problem happens when I change the height of the map via css and live reloads the map
-            // this code should prevent this from happening when resizing the map in the css
-            //https://stackoverflow.com/questions/19564366/unwanted-gray-area-on-map
-            setTimeout(this.map.invalidateSize.bind(this.map));
-        }
+            // console.log("geojson adding done");
+        },
     }
 
     const markerManager = {
@@ -117,6 +124,7 @@ import { designerInfoHTML } from "./components/designerInfo.js";
         init() {
             this.computeMarkerStateAtEachZoomLevel();
             this.renderMarkers();
+            // console.log("markers rendered");
         },
 
         removeMarkersFromMap() {
@@ -299,6 +307,7 @@ import { designerInfoHTML } from "./components/designerInfo.js";
         // somewhat inaccurate b/c some latlngs are close enough that px coordinates are the same, 
         // so predictions become inaccurate since they rely solely on rendering based on pixel coordinates.
         computeMarkerStateAtEachZoomLevel() {
+            // console.log("compute marker state start");
             // distance in px between this and all markers computed
             const data = controller.getPeopleData();
             let refPointInPxCoords = mapManager.map.latLngToContainerPoint(this.referencePoint.posInLatLng);
@@ -508,8 +517,10 @@ import { designerInfoHTML } from "./components/designerInfo.js";
     const controller = {
         async init() {
             this.setPeopleData(await this.loadAndProcessDataset());
-            mapManager.init();
+            mapManager.initializeMap(); // this MUST execute before markerManager.init()
+            mapManager.initializeGeoJSONLayers();
             markerManager.init();
+            mapManager.attachEventHandlersToMap();
             controlPanelView.init();
         },
 
@@ -559,15 +570,6 @@ import { designerInfoHTML } from "./components/designerInfo.js";
         getSelectedMarkerData() {
             return model.selectedMarkerData;
         },
-
-        setMarkerViewMode(mode) {
-            model.markerViewMode = mode;
-            markerManager.renderMarkers();
-        },
-
-        getMarkerViewMode() {
-            return model.markerViewMode;
-        }
     }
     
     controller.init();
