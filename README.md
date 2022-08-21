@@ -10,3 +10,4 @@
 - cite code sources
 - keep commits smaller
 - test on various devices
+- make it so that tooltips are always visible after clicking on a person on the list

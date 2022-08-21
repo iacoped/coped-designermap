@@ -4,12 +4,12 @@ import { getSlopeGivenTwoPoints } from "../utils/geometry/getSlopeGivenTwoPoints
 import { getPointsOnSameSlope } from "../utils/geometry/getPointsOnSameSlopeAndCertainDistanceAway.js";
 import { getMidpoint } from "../utils/geometry/getMidpoint.js";
 
+// While intersections still exist:
+//   1. for each marker m1 that is not in a group:
+//      1. find any markers m2 that are not in a group and m1 != m2, combine them into merged marker (add radius, find midpoint of i and marker)
+//      2. mark intersecting markers as "merged" already (they should not be considered anymore)
+//      3. don't mark i as merged (merged marker might end up intersecting with it in future)
 export function markerMergeV8(markers) {
-    // While intersections still exist:
-    //   1. for each marker m1 that is not in a group:
-    //      1. find any markers m2 that are not in a group and m1 != m2, combine them into merged marker (add radius, find midpoint of i and marker)
-    //      2. mark intersecting markers as "merged" already (they should not be considered anymore)
-    //      3. don't mark i as merged (merged marker might end up intersecting with it in future)
     const markerKeys = Object.keys(markers);
     let intersectionsStillExist = true; 
     while (intersectionsStillExist) {
@@ -104,8 +104,6 @@ export function markerMergeV8(markers) {
             }
         }
     }
-    // all the markers that are marked inGroup are already part of a group
-    const mergedMarkers = markers;
-    // console.log("end")
-    return mergedMarkers;
+
+    return markers;
 }
