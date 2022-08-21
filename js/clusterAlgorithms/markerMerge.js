@@ -3,7 +3,8 @@ import { getTwoCirclesIntersectionInfo } from "../utils/geometry/getTwoCirclesIn
 import { getSlopeGivenTwoPoints } from "../utils/geometry/getSlopeGivenTwoPoints.js";
 import { getPointsOnSameSlope } from "../utils/geometry/getPointsOnSameSlopeAndCertainDistanceAway.js";
 import { getMidpoint } from "../utils/geometry/getMidpoint.js";
-
+import { getDirectionOfP2RelativeToP1 } from "../utils/geometry/getDirectionOfP2RelativeToP1.js";
+import { getPointOnLineWithDistanceDirection } from "../utils/geometry/getPointOnLineWithDistanceDirection.js";
 // While intersections still exist:
 //   1. for each marker m1 that is not in a group:
 //      1. find any markers m2 that are not in a group and m1 != m2, combine them into merged marker (add radius, find midpoint of i and marker)
@@ -66,39 +67,11 @@ export function markerMergeV8(markers) {
                     
                     
                     if (!(intersectionInfo.c1ContainsC2 || intersectionInfo.c2ContainsC1)) {
-
                         const midpoint = getMidpoint(winner.coords, loser.coords);
                         const distanceToMidpoint = getDistanceBetweenTwoPoints(winner.coords, midpoint);
                         const distanceToMoveMergedMarker = distanceToMidpoint * (loser.radius / winner.radius);
-
-                        if (winner.coords.x == loser.coords.x && winner.coords.y == loser.coords.y) {
-                            winner.radius += 1;
-                        } else if (winner.coords.y == loser.coords.y) {
-                            if (winner.coords.x > loser.coords.x) {
-                                winner.coords.x -= distanceToMoveMergedMarker;
-                            } else {
-                                winner.coords.x += distanceToMoveMergedMarker;
-                            }
-                        } else if (winner.coords.x == loser.coords.x) {
-                            if (winner.coords.y > loser.coords.y) {
-                                winner.coords.y -= distanceToMoveMergedMarker;
-                            } else {
-                                winner.coords.y += distanceToMoveMergedMarker;
-                            }
-                        } else {
-                            const slope = getSlopeGivenTwoPoints(winner.coords, loser.coords);
-                            const pointsOnSameSlope = getPointsOnSameSlope(winner.coords, distanceToMoveMergedMarker, slope);
-                            if (slope < 0 && winner.coords.x > loser.coords.x) {
-                                winner.coords = pointsOnSameSlope[1];   
-                            } else if (slope < 0 && winner.coords.x < loser.coords.x) {
-                                winner.coords = pointsOnSameSlope[0];
-                            } else if (slope > 0 && winner.coords.x < loser.coords.x) {
-                                winner.coords = pointsOnSameSlope[0];
-                            } else if (slope > 0 && winner.coords.x > loser.coords.x) {
-                                winner.coords = pointsOnSameSlope[1];
-                            }
-                            winner.radius += 1;
-                        }
+                        winner.coords = getPointOnLineWithDistanceDirection(winner.coords, loser.coords, distanceToMoveMergedMarker);
+                        winner.radius += 1;
                     } 
                 }  
             }

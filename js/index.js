@@ -5,10 +5,11 @@ import { markerMergeV8 } from "./clusterAlgorithms/markerMerge.js";
 import { markerSplitV3 } from "./clusterAlgorithms/markerSplit.js";
 import { fetchJson } from "./utils/ajax/fetchJson.js";
 import { createDeepCopy } from "./utils/core/createDeepCopy.js";
+import { getPointOnLineWithDistanceDirection } from "./utils/geometry/getPointOnLineWithDistanceDirection.js";
 import { getDistanceBetweenTwoPoints } from "./utils/geometry/getDistanceBetweenTwoPoints.js";
 import { getSlopeGivenTwoPoints } from "./utils/geometry/getSlopeGivenTwoPoints.js";
 import { getPointsOnSameSlope } from "./utils/geometry/getPointsOnSameSlopeAndCertainDistanceAway.js";
-import { getDirectionOfP2RelativeToP1 } from "./utils/geometry/getDirectionOfP1RelativeToP2.js";
+import { getDirectionOfP2RelativeToP1 } from "./utils/geometry/getDirectionOfP2RelativeToP1.js";
 import { designerInfoHTML } from "./components/designerInfo.js";
 (() => {
     'use strict';
@@ -327,11 +328,9 @@ import { designerInfoHTML } from "./components/designerInfo.js";
 
                 const distance = getDistanceBetweenTwoPoints(refPointInPxCoords, markerCoordsInPx);
 
-                let directionToPlaceMarkerRelativeToReferencePoint = getDirectionOfP2RelativeToP1(refPointInPxCoords, markerCoordsInPx);
                 referenceInfo.push({
                     distance: distance,
                     originalMarkerCoordsInPx: markerCoordsInPx,
-                    directionToPlaceMarkerRelativeToReferencePoint: directionToPlaceMarkerRelativeToReferencePoint,
                 })
                 
             }   
@@ -342,62 +341,7 @@ import { designerInfoHTML } from "./components/designerInfo.js";
                 for (let j = 0; j < referenceInfo.length; j++) {
                     // Assuming a zoomSnap value of 1 (see line 27, the visual distance between markers increases by a factor of 2 each zoom level.)
                     let newDistance = referenceInfo[j].distance * (Math.pow(2, factor));
-                    let newMarkerCoordsInPx;
-                    let slope;
-                    let points;
-                    switch (referenceInfo[j].directionToPlaceMarkerRelativeToReferencePoint) {
-                        case ("none"): // marker is right on top of refPoint (very unlikely)
-                            newMarkerCoordsInPx = createDeepCopy(refPointInPxCoords);
-                            break;
-                        case ("to its left"):
-                            newMarkerCoordsInPx = {
-                                x: refPointInPxCoords.x - newDistance,
-                                y: refPointInPxCoords.y
-                            }
-                            break;
-                        case ("to its right"):
-                            newMarkerCoordsInPx = {
-                                x: refPointInPxCoords.x + newDistance,
-                                y: refPointInPxCoords.y
-                            }
-                            break;
-                        case ("above it"):
-                            newMarkerCoordsInPx = {
-                                x: refPointInPxCoords.x,
-                                y: refPointInPxCoords.y + newDistance
-                            }
-                            break;
-                        case ("below it"):
-                            markerCoordsInPx = {
-                                x: refPointInPxCoords.x,
-                                y: refPointInPxCoords.y - newDistance
-                            }
-                            break;
-                        case ("its upper left"):
-                            // console.log(refPointInPxCoords, referenceInfo[j].originalMarkerCoordsInPx);
-                            slope = getSlopeGivenTwoPoints(refPointInPxCoords, referenceInfo[j].originalMarkerCoordsInPx);
-                            points = getPointsOnSameSlope(refPointInPxCoords, newDistance, slope);
-                            newMarkerCoordsInPx = points[1];
-                            break;
-                        case ("its bottom right"):
-                            // console.log(refPointInPxCoords, referenceInfo[j].originalMarkerCoordsInPx);
-                            slope = getSlopeGivenTwoPoints(refPointInPxCoords, referenceInfo[j].originalMarkerCoordsInPx);
-                            points = getPointsOnSameSlope(refPointInPxCoords, newDistance, slope);
-                            newMarkerCoordsInPx = points[0];
-                            break;
-                        case ("its upper right"):
-                            // console.log(refPointInPxCoords, referenceInfo[j].originalMarkerCoordsInPx);
-                            slope = getSlopeGivenTwoPoints(refPointInPxCoords, referenceInfo[j].originalMarkerCoordsInPx);
-                            points = getPointsOnSameSlope(refPointInPxCoords, newDistance, slope);
-                            newMarkerCoordsInPx = points[0];
-                            break;
-                        case ("its bottom left"):
-                            // console.log(refPointInPxCoords, referenceInfo[j].originalMarkerCoordsInPx);
-                            slope = getSlopeGivenTwoPoints(refPointInPxCoords, referenceInfo[j].originalMarkerCoordsInPx);
-                            points = getPointsOnSameSlope(refPointInPxCoords, newDistance, slope);
-                            newMarkerCoordsInPx = points[1];
-                            break;
-                    }
+                    const newMarkerCoordsInPx = getPointOnLineWithDistanceDirection(refPointInPxCoords, referenceInfo[j].originalMarkerCoordsInPx, newDistance);
                     
                     // if this key is already present, means it was already split at some lower zoom level.
                     // all that needs to be done is update the location of its child markers.
