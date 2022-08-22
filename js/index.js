@@ -428,7 +428,6 @@ import { designerInfoHTML } from "./components/designerInfo.js";
                 for (const person of people) {
                     let listItemDOMEle = document.createElement("li");
                     listItemDOMEle.textContent = person.name;
-                    // maybe highlight the marker on hover over person's name?
                     listItemDOMEle.addEventListener("click", () => {
                         markerManager.manuallyShowPersonPopup(person);
                     });
