@@ -7,9 +7,6 @@ import { fetchJson } from "./utils/ajax/fetchJson.js";
 import { createDeepCopy } from "./utils/core/createDeepCopy.js";
 import { getPointOnLineWithDistanceDirection } from "./utils/geometry/getPointOnLineWithDistanceDirection.js";
 import { getDistanceBetweenTwoPoints } from "./utils/geometry/getDistanceBetweenTwoPoints.js";
-import { getSlopeGivenTwoPoints } from "./utils/geometry/getSlopeGivenTwoPoints.js";
-import { getPointsOnSameSlope } from "./utils/geometry/getPointsOnSameSlopeAndCertainDistanceAway.js";
-import { getDirectionOfP2RelativeToP1 } from "./utils/geometry/getDirectionOfP2RelativeToP1.js";
 import { designerInfoHTML } from "./components/designerInfo.js";
 (() => {
     'use strict';

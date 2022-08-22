@@ -7,9 +7,10 @@ import { getDirectionOfP2RelativeToP1 } from "./getDirectionOfP2RelativeToP1.js"
 * 1. It is on the line formed by joining p1 and p2.
 * 2. It is distance D away from p1.
 * 3. Its direction relative to p1 is equal to p2's direction relative to p1.
-* @summary If the description is long, write your summary here. Otherwise, feel free to remove this.
-* @param {ParamDataTypeHere} parameterNameHere - Brief description of the parameter here. Note: For other notations of data types, please refer to JSDocs: DataTypes command.
-* @return {ReturnValueDataTypeHere} Brief description of the returning value here.
+* @param {{x: Number, y: Number}} p1 point in 2D space.
+* @param {{x: Number, y: Number}} p2 point in 2D space.
+* @param {Number} distanceFromP1 distance from p1 that p3 must be.
+* @return {{x: Number, y: Number}} point that satisfies the criteria.
 */
 export function getPointOnLineWithDistanceDirection(p1, p2, distanceFromP1) {
     const directionOfP2RelativetoP1 = getDirectionOfP2RelativeToP1(p1, p2);

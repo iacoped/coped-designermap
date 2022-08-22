@@ -1,9 +1,9 @@
 /** 
-* given p1 and p2, points in 2D space, returns the direction of p2 relative to 
+* Given p1 and p2, points in 2D space, returns the direction of p2 relative to 
 * p1 in human-readable language.
-* @summary If the description is long, write your summary here. Otherwise, feel free to remove this.
-* @param {ParamDataTypeHere} parameterNameHere - Brief description of the parameter here. Note: For other notations of data types, please refer to JSDocs: DataTypes command.
-* @return {ReturnValueDataTypeHere} Brief description of the returning value here.
+* @param {{x: Number, y: Number}} p1 point in 2D space.
+* @param {{x: Number, y: Number}} p2 point in 2D space.
+* @return {String} direction of p2 relative to p1 in human-readable language.
 */
 export function getDirectionOfP2RelativeToP1(p1, p2) {
     if (p1.x == p2.x && p1.y == p2.y) { // they have the same coordinates

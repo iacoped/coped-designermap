@@ -2,10 +2,10 @@
 * Given the co-ordinates of a 2-dimensional point p(x0, y0), find the points at a distance L 
 * away from it, such that the line formed by joining these points has a slope of M.
 * https://www.geeksforgeeks.org/find-points-at-a-given-distance-on-a-line-of-given-slope/
-* Brief description of the function here.
-* @summary If the description is long, write your summary here. Otherwise, feel free to remove this.
-* @param {ParamDataTypeHere} parameterNameHere - Brief description of the parameter here. Note: For other notations of data types, please refer to JSDocs: DataTypes command.
-* @return {ReturnValueDataTypeHere} Brief description of the returning value here.
+* @param {{x: Number, y: Number}} point point in 2D space.
+* @param {Number} distance distance from p1 that returned points must be.
+* @param {Number} slope slope 
+* @return {Array<{x: Number, y: Number}>} points that satisfy the criteria.
 */
 
 export function getPointsOnSameSlope(point, distance, slope) {

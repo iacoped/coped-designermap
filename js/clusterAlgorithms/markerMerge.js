@@ -1,9 +1,6 @@
 import { getDistanceBetweenTwoPoints } from "../utils/geometry/getDistanceBetweenTwoPoints.js";
 import { getTwoCirclesIntersectionInfo } from "../utils/geometry/getTwoCirclesIntersectionInfo.js";
-import { getSlopeGivenTwoPoints } from "../utils/geometry/getSlopeGivenTwoPoints.js";
-import { getPointsOnSameSlope } from "../utils/geometry/getPointsOnSameSlopeAndCertainDistanceAway.js";
 import { getMidpoint } from "../utils/geometry/getMidpoint.js";
-import { getDirectionOfP2RelativeToP1 } from "../utils/geometry/getDirectionOfP2RelativeToP1.js";
 import { getPointOnLineWithDistanceDirection } from "../utils/geometry/getPointOnLineWithDistanceDirection.js";
 // While intersections still exist:
 //   1. for each marker m1 that is not in a group:

@@ -1,8 +1,8 @@
 /** 
-* Brief description of the function here.
-* @summary If the description is long, write your summary here. Otherwise, feel free to remove this.
-* @param {ParamDataTypeHere} parameterNameHere - Brief description of the parameter here. Note: For other notations of data types, please refer to JSDocs: DataTypes command.
-* @return {ReturnValueDataTypeHere} Brief description of the returning value here.
+* Given p1 and p2, points in 2D space, returns their midpoint.
+* @param {{x: Number, y: Number}} p1 point in 2D space.
+* @param {{x: Number, y: Number}} p2 point in 2D space.
+* @return {{x: Number, y: Number}} midpoint of p1 and p2.
 */
 export function getMidpoint(p1, p2) {
     return {

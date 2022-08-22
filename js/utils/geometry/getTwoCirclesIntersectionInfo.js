@@ -1,8 +1,10 @@
 /** 
-* Brief description of the function here.
-* @summary If the description is long, write your summary here. Otherwise, feel free to remove this.
-* @param {ParamDataTypeHere} parameterNameHere - Brief description of the parameter here. Note: For other notations of data types, please refer to JSDocs: DataTypes command.
-* @return {ReturnValueDataTypeHere} Brief description of the returning value here.
+* Given the radii of two circles and the distance between their
+* centers, returns info about the nature of their intersection.
+* @param {Number} r1 radius of the first circle.
+* @param {Number} r2 radius of the second circle.
+* @param {Number} distanceBetweenCenters distance between the centers.
+* @return {Object}} Info about the intersection.
 */
 export function getTwoCirclesIntersectionInfo(r1, r2, distanceBetweenCenters) {
     let info = {
