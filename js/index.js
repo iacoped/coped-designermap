@@ -27,7 +27,7 @@ import { designerInfoHTML } from "./components/designerInfo.js";
                 // worldCopyJump: true,
                 maxBounds: [ // stops leaflet from requesting tiles outside map bounds (causes HTTP 400)
                     [-90, -180],
-                    [90, 270]
+                    [90, 180]
                 ],
                 maxBoundsViscosity: 1.0,
             }
