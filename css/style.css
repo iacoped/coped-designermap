@@ -284,6 +284,7 @@ main {
     #map {
         order: 2;
         height: 100%;
+        display: none;
     }
 
     #sidebar {
