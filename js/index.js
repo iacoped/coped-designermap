@@ -449,6 +449,23 @@ import { designerInfoHTML } from "./components/designerInfo.js";
                 // dropdownDOMEle.classList.add("hidden");
             });
 
+            // populate list
+            const listDOMEle = document.querySelector("#mobile-designer-list ul");
+            const data = controller.getPeopleData();
+            const keys = Object.keys(data);
+
+            for (const key of keys) {
+                const people = data[key].people;
+                for (const person of people) {
+                    let listItemDOMEle = document.createElement("li");
+                    listItemDOMEle.textContent = person.name;
+                    listItemDOMEle.addEventListener("click", () => {
+                        markerManager.manuallyShowPersonPopup(person);
+                    });
+                    listDOMEle.appendChild(listItemDOMEle);
+                }
+            }
+
             function render() {
                 dropdownDOMEle.style.display = dropdownVisible ? "grid" : "none";
             }

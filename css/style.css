@@ -267,6 +267,16 @@ main {
     /* order: 1; */
 }
 
+#mobile-designer-list {
+    max-height: 200px;
+    overflow-y: scroll;
+}
+
+#mobile-designer-list ul {
+    list-style-type: none;
+    padding: 0;
+}
+
 #dropdown section {
     padding: 15px;
 }
