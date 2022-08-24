@@ -244,8 +244,8 @@ main {
 
 
 #mobile-sidebar #dropdown {
-    /* display: grid; */
-    display: none;
+    display: grid;
+    /* display: none; */
     background-color: #31939B;
     position: absolute;
     width: 100%;
@@ -256,8 +256,8 @@ main {
     grid-gap: 10px;
     padding: 10px;
     padding-top: 0px;
-    font-size: 24px;
-    font-weight: bold;
+    
+    
     /* grid-template-columns: 40fr 60fr;
     grid-template-rows: 100fr; */
     /* order: 1; */
@@ -268,12 +268,15 @@ main {
 }
 
 #dropdown h2 {
-    font-size: inherit;
+    font-weight: bold;
+    font-size: 24px;
     margin: 0;
 }
 
 #add-to-map a {
+    font-size: 24px;
     color: #31939B;
+    font-weight: bold;
 }
 
 /* MEDIA QUERIES */
