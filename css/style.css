@@ -26,6 +26,16 @@ body {
     width: 100%;
 }
 
+button {
+    background: none;
+	color: inherit;
+	border: none;
+	padding: 0;
+	font: inherit;
+	cursor: pointer;
+	outline: inherit;
+}
+
 main {
     display: flex;
     flex-direction: row;
@@ -41,6 +51,8 @@ main {
     grid-row-start: 1;
     grid-row-end: 1;
     width: 100%;
+    order: 1;
+    z-index: 0;
 }
 
 #sidebar {
@@ -61,6 +73,7 @@ main {
     font-family: dinRegular;
     max-width: 300px;
     justify-items: stretch;
+    order: 2;
 }
 
 #sidebar section {
@@ -156,6 +169,117 @@ main {
     margin-bottom: 20px;
 }
 
+/* MOBILE STYLES */
+
+#mobile-sidebar {
+    position: relative;
+    /* height: 10vh; */
+    /* height: 200px; */
+    /* height: 20vw; */
+    height: 125px;
+    min-height: 60px;
+    max-height: 125px;
+    min-width: 300px;
+    display: none;
+    background-color: #31939B;
+    color: #31939B;
+    grid-template-columns: 150px auto;
+    grid-template-rows: 100fr;
+    grid-gap: 10px;
+    padding: 10px; 
+    font-family: dinRegular;
+    order: 1;
+    z-index: 1;
+    /* margin-bottom: 100px; */
+}
+
+#mobile-sidebar section {
+    background-color: white;
+}
+
+#mobile-logo-container {
+    display: flex;
+    justify-content: center;
+    height: 100%;
+    /* justify-content: center;
+    align-items: center; */
+    padding: 5px;
+    /* max-height: 60%; */
+}
+
+/* the coped logo */
+#mobile-logo-container img {
+    /* display: none; */
+    grid-row-start: 1;
+    grid-row-end: 1;
+    grid-column-start: 1;
+    grid-column-end: 1;
+    min-width: 20px;
+    /* width: 90%; */
+    max-width: 150px;
+}
+
+#button-container {
+    display: flex;
+    justify-content: flex-end;
+    /* align-items: center; */
+    /* height: 10px; */
+}
+
+#button-container button {
+    /* height: 100px; */
+    /* border: 2px red solid; */
+}
+
+#button-container img {
+    height: 100%;
+}
 
 
+#mobile-sidebar #dropdown {
+    /* display: grid; */
+    display: none;
+    background-color: #31939B;
+    position: absolute;
+    width: 100%;
+    /* top: 100%;
+     */
+    bottom: -1000px;
+    padding-top: 0px;
+    /* grid-template-columns: 40fr 60fr;
+    grid-template-rows: 100fr; */
+    /* order: 1; */
+}
+
+#dropdown section {
+    padding: 15px;
+}
+
+
+
+/* #button-container button:hover #dropdown {
+    display: block;
+} */
+
+
+/* MEDIA QUERIES */
+
+@media screen and (max-width: 992px) {
+    main {
+        flex-direction: column;
+    }
+
+    #map {
+        order: 2;
+        height: 100%;
+    }
+
+    #sidebar {
+        display: none;
+    }
+
+    #mobile-sidebar {
+        display: grid;
+    }
+}
 
