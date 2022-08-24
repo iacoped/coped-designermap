@@ -237,6 +237,7 @@ main {
 }
 
 #button-container img {
+    display: none;
     height: 100%;
 }
 
@@ -271,7 +272,7 @@ main {
 }
 
 #add-to-map a {
-    color:#31939B;
+    color: #31939B;
 }
 
 /* MEDIA QUERIES */
