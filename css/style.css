@@ -245,7 +245,7 @@ main {
 
 #mobile-sidebar #dropdown {
     /* display: grid; */
-    display: grid;
+    display: none;
     background-color: #31939B;
     position: absolute;
     width: 100%;
