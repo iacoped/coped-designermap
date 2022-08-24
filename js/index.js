@@ -417,7 +417,7 @@ import { designerInfoHTML } from "./components/designerInfo.js";
         },
     }
 
-    const controlPanelView = {
+    const sidebarView = {
         init() {
             const listDOMEle = document.querySelector("#designer-list ul");
             const data = controller.getPeopleData();
@@ -437,6 +437,31 @@ import { designerInfoHTML } from "./components/designerInfo.js";
         },
     }
 
+    const mobileSidebarView = {
+        init() {
+            let dropdownVisible = false;
+            const dropdownToggleDOMEle = document.querySelector("#button-container");
+            const dropdownDOMEle = document.querySelector("#dropdown");
+            dropdownToggleDOMEle.addEventListener("click", () => {
+                this.setDropdownState(!dropdownVisible);
+                // dropdownDOMEle.style.display = "none";
+                render();
+                // dropdownDOMEle.classList.add("hidden");
+            });
+
+            function render() {
+                dropdownDOMEle.style.display = dropdownVisible ? "grid" : "none";
+            }
+
+            this.setDropdownState = (state) => {
+                dropdownVisible = state;
+                render();
+            };
+
+            render();
+        }
+    }
+
     const controller = {
         async init() {
             this.setPeopleData(await this.loadAndProcessDataset());
@@ -444,7 +469,8 @@ import { designerInfoHTML } from "./components/designerInfo.js";
             mapManager.initializeGeoJSONLayers(); // async
             markerManager.init();
             mapManager.attachEventHandlersToMap();
-            controlPanelView.init();
+            sidebarView.init();
+            mobileSidebarView.init();
         },
 
         async loadAndProcessDataset() {
