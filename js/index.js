@@ -452,7 +452,7 @@ import { designerInfoHTML } from "./components/designerInfo.js";
             function render() {
                 dropdownDOMEle.style.display = dropdownVisible ? "grid" : "none";
             }
-
+            // public but state variable is private
             this.setDropdownState = (state) => {
                 dropdownVisible = state;
                 render();
