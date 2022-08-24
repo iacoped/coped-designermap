@@ -18,6 +18,10 @@
     font-weight: bold;
 }
 
+a {
+    text-decoration: none;
+}
+
 /* https://alvarotrigo.com/blog/how-to-create-websites-fullscreen-sections-html-and-css/ */
 html,
 body {
@@ -239,14 +243,19 @@ main {
 
 #mobile-sidebar #dropdown {
     /* display: grid; */
-    display: none;
+    display: grid;
     background-color: #31939B;
     position: absolute;
     width: 100%;
     /* top: 100%;
      */
-    bottom: -1000px;
+    top: 100%;
+    /* bottom: -1000px; */
+    grid-gap: 10px;
+    padding: 10px;
     padding-top: 0px;
+    font-size: 24px;
+    font-weight: bold;
     /* grid-template-columns: 40fr 60fr;
     grid-template-rows: 100fr; */
     /* order: 1; */
@@ -256,12 +265,14 @@ main {
     padding: 15px;
 }
 
+#dropdown h2 {
+    font-size: inherit;
+    margin: 0;
+}
 
-
-/* #button-container button:hover #dropdown {
-    display: block;
-} */
-
+#add-to-map a {
+    color:#31939B;
+}
 
 /* MEDIA QUERIES */
 
