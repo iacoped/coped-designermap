@@ -189,6 +189,7 @@ main {
     min-height: 60px;
     max-height: 125px;
     min-width: 280px;
+    width: 100%;
     display: none;
     background-color: #31939B;
     color: #31939B;
@@ -242,13 +243,14 @@ main {
 
 #mobile-sidebar #dropdown {
     display: none;
-    /* display: none; */
     background-color: #31939B;
     position: absolute;
-    width: 100%;
+    width: inherit;
     left: 0;
     top: 100%;
-    grid-gap: 10px;
+    /* grid-gap: 10px; */
+    row-gap: 10px;
+    flex-direction: column;
     padding: 10px;
 }
 

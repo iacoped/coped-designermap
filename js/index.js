@@ -490,7 +490,7 @@ import { designerInfoHTML } from "./components/designerInfo.js";
             }
 
             function render() {
-                dropdownDOMEle.style.display = dropdownVisible ? "grid" : "none";
+                dropdownDOMEle.style.display = dropdownVisible ? "flex" : "none";
                 aboutContentDOMEle.style.display = aboutVisible ? "block" : "none";
                 designerListContentDOMEle.style.display = designerListVisible ? "block" : "none";
             }
