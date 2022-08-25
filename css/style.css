@@ -248,7 +248,7 @@ main {
 /* THIS IS SOMEHOW DISPLAYING OUTSIDE CONTAINER ON MOBILE BAD */
 #button-container img {
     /* display: none; */
-    height: 100%;
+    width: 50%;
 }
 
 
