@@ -256,7 +256,7 @@ main {
 #mobile-designer-list {
     /* position: absolute; */
     max-height: 200px;
-    overflow-y: hidden;
+    /* overflow-y: hidden; */
 }
 
 #mobile-designer-list ul {
