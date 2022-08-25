@@ -449,7 +449,8 @@ import { designerInfoHTML } from "./components/designerInfo.js";
                 // dropdownDOMEle.classList.add("hidden");
             });
 
-            const aboutDOMEle = document.querySelector("#mobile-about-map h2");
+            const aboutDOMEle = document.querySelector("#about-toggler");
+            const aboutArrowDOMEle = document.querySelector("#about-toggler img");
             let aboutVisible = false;
             const aboutContentDOMEle = document.querySelector("#mobile-about-map p");
             aboutDOMEle.addEventListener("click", () => {
@@ -459,7 +460,8 @@ import { designerInfoHTML } from "./components/designerInfo.js";
                 // aboutContentDOMEle.classList.add("hidden");
             });
 
-            const designerListDOMEle = document.querySelector("#mobile-designer-list h2");
+            const designerListDOMEle = document.querySelector("#designer-list-toggler");
+            const designerListArrowDOMEle = document.querySelector("#designer-list-toggler img");
             let designerListVisible = false;
             const designerListContentDOMEle = document.querySelector("#mobile-designer-list ul");
             designerListDOMEle.addEventListener("click", () => {
@@ -493,6 +495,8 @@ import { designerInfoHTML } from "./components/designerInfo.js";
                 dropdownDOMEle.style.display = dropdownVisible ? "flex" : "none";
                 aboutContentDOMEle.style.display = aboutVisible ? "block" : "none";
                 designerListContentDOMEle.style.display = designerListVisible ? "block" : "none";
+                aboutArrowDOMEle.src = aboutVisible ? "./assets/images/arrow-up.svg" : "./assets/images/arrow-down.svg";
+                designerListArrowDOMEle.src = designerListVisible ? "./assets/images/arrow-up.svg" : "./assets/images/arrow-down.svg";
             }
             // public but state variable is private
             this.setDropdownState = (state) => {

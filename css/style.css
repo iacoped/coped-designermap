@@ -283,6 +283,11 @@ main {
     /* align-items: stretch; */
 }
 
+#dropdown img {
+    width: 15px;
+    height: 15px;
+}
+
 #dropdown p, ul {
     padding-left: 15px;
 }
@@ -290,6 +295,11 @@ main {
 #dropdown div, #dropdown a {
     border: 2px blue solid;
     padding: 15px;
+}
+
+#dropdown div {
+    display: flex;
+    align-items: center;
 }
 
 #dropdown h2 {
@@ -300,6 +310,7 @@ main {
     font-weight: bold;
     font-size: 24px;
     margin: 0;
+    flex-grow: 1;
 
 }
 
