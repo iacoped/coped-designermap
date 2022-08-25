@@ -328,3 +328,22 @@ main {
     }
 }
 
+@media screen and (max-height: 700px) {
+    main {
+        flex-direction: column;
+    }
+
+    #map {
+        order: 2;
+        height: 100%;
+    }
+
+    #sidebar {
+        display: none;
+    }
+
+    #mobile-sidebar {
+        display: flex;
+    }
+}
+
