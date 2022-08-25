@@ -293,7 +293,7 @@ main {
 }
 
 #dropdown div, #dropdown a {
-    border: 2px blue solid;
+    /* border: 2px blue solid; */
     padding: 15px;
 }
 
@@ -306,7 +306,7 @@ main {
     /* flex-grow: 1; */
     /* width: 100vh; */
     /* vertical-align: middle; */
-    border: 2px red solid;
+    /* border: 2px red solid; */
     font-weight: bold;
     font-size: 24px;
     margin: 0;
