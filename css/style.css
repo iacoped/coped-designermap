@@ -28,6 +28,7 @@ body {
     margin: 0;
     height: 100vh;
     width: 100vw;
+    font-size: 100%;
 }
 
 button {
@@ -77,6 +78,7 @@ main {
     color: #31939B;
     font-family: dinRegular;
     max-width: 300px;
+    /* width: 30vw; */
     justify-items: stretch;
     order: 2;
 }
@@ -111,6 +113,7 @@ main {
     grid-row-start: 2;
     grid-row-end: 2;
     font-size: 1.5em;
+    /* font-size: 3vh; */
     
 }
 
