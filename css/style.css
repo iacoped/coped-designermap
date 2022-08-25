@@ -234,21 +234,27 @@ main {
 
 #button-container {
     flex-grow: 1;
+    /* align-items: center; */
     display: flex;
     justify-content: flex-end;
-    /* align-items: center; */
+    align-items: center;
     /* height: 10px; */
 }
 
 #button-container button {
+    /* display: inline-block;     */
+    margin-right: 10px;
+    height: 90%;
+    /* width: 50%; */
     /* height: 100px; */
     /* border: 2px red solid; */
 }
 
 /* THIS IS SOMEHOW DISPLAYING OUTSIDE CONTAINER ON MOBILE BAD */
 #button-container img {
+    height: inherit;
     /* display: none; */
-    width: 50%;
+    /* width: 50%; */
 }
 
 
