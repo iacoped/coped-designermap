@@ -261,12 +261,13 @@ main {
 }
 
 #mobile-designer-list ul {
-    border: 2px red solid;
+    /* border: 2px red solid; */
     max-height: 140px;
     /* max-height: 10%; */
     list-style-type: none;
     overflow-y: scroll;
     padding: 0;
+    padding-top: 10px;
     /* padding: 10px 10px 10px 0px; */
     margin: 10px 10px 10px 0px;
 }
