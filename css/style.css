@@ -243,7 +243,7 @@ main {
 
 #button-container button {
     /* display: inline-block;     */
-    /* margin-right: 10px; */
+    margin-right: 10px;
     height: 90%;
     /* width: 50%; */
     /* height: 100px; */
