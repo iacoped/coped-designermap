@@ -297,9 +297,10 @@ main {
 }
 
 #add-to-map a {
-    font-size: 24px;
+    /* margin-top: 200px; */
+    /* font-size: 24px; */
     color: #31939B;
-    font-weight: bold;
+    /* font-weight: bold; */
 }
 
 /* MEDIA QUERIES */
