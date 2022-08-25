@@ -221,6 +221,7 @@ main {
 
 /* the coped logo */
 #mobile-logo-container img {
+    display: inline;
     /* display: none; */
     grid-row-start: 1;
     grid-row-end: 1;
