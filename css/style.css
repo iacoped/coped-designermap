@@ -192,9 +192,11 @@ main {
     display: none;
     background-color: #31939B;
     color: #31939B;
-    grid-template-columns: 150px auto;
+    /* grid-template-columns: 150px auto;
     grid-template-rows: 100fr;
-    grid-gap: 10px;
+    grid-gap: 10px; */
+    justify-content: space-between;
+    column-gap: 10px;
     padding: 10px; 
     font-family: dinRegular;
     order: 1;
@@ -207,6 +209,7 @@ main {
 }
 
 #mobile-logo-container {
+    /* flex-grow: 1; */
     display: flex;
     justify-content: center;
     height: 100%;
@@ -229,6 +232,7 @@ main {
 }
 
 #button-container {
+    flex-grow: 1;
     display: flex;
     justify-content: flex-end;
     /* align-items: center; */
@@ -325,7 +329,7 @@ main {
     }
 
     #mobile-sidebar {
-        display: grid;
+        display: flex;
     }
 }
 
