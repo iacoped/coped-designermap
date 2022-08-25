@@ -267,7 +267,7 @@ main {
     list-style-type: none;
     overflow-y: scroll;
     padding: 0;
-    /* padding-top: 10px; */
+    padding-top: 5px;
     /* padding: 10px 10px 10px 0px; */
     margin: 10px 10px 10px 0px;
 }
