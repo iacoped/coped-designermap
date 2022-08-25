@@ -1,5 +1,13 @@
+/*
+* Prefixed by https://autoprefixer.github.io
+* PostCSS: v8.4.14,
+* Autoprefixer: v10.4.7
+* Browsers: last 4 version
+*/
+
 * {
-    box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+            box-sizing: border-box;
 }
 
 @font-face {
@@ -41,8 +49,13 @@ button {
 }
 
 main {
+    display: -webkit-box;
+    display: -ms-flexbox;
     display: flex;
-    flex-direction: row;
+    -webkit-box-orient: horizontal;
+    -webkit-box-direction: normal;
+        -ms-flex-direction: row;
+            flex-direction: row;
     height: 100vh;
     width: 100vw;
     /* grid-template-columns: 80fr 20fr;
@@ -51,22 +64,35 @@ main {
 }
 
 #map { 
-    grid-column-start: 1;
+    -ms-grid-column: 1; 
+        grid-column-start: 1;
+    -ms-grid-column-span: 0;
     grid-column-end: 1;
-    grid-row-start: 1;
+    -ms-grid-row: 1;
+        grid-row-start: 1;
+    -ms-grid-row-span: 0;
     grid-row-end: 1;
     width: 100%;
-    order: 1;
+    -webkit-box-ordinal-group: 2;
+        -ms-flex-order: 1;
+            order: 1;
     z-index: 0;
 }
 
 #sidebar {
-    grid-column-start: 2;
+    -ms-grid-column: 2;
+        grid-column-start: 2;
+    -ms-grid-column-span: 0;
     grid-column-end: 2;
-    grid-row-start: 1;
+    -ms-grid-row: 1;
+        grid-row-start: 1;
+    -ms-grid-row-span: 0;
     grid-row-end: 1;
+    display: -ms-grid;
     display: grid;
+    -ms-grid-columns: 100fr;
     grid-template-columns: 100fr;
+    -ms-grid-rows: 20fr 15px 40fr 15px 40fr;
     grid-template-rows: 20fr 40fr 40fr;
     grid-gap: 15px;
     padding: 15px;
@@ -78,26 +104,57 @@ main {
     font-family: dinRegular;
     max-width: 300px;
     justify-items: stretch;
-    order: 2;
+    -webkit-box-ordinal-group: 3;
+        -ms-flex-order: 2;
+            order: 2;
+}
+
+#sidebar > *:nth-child(1) {
+    -ms-grid-row: 1;
+    -ms-grid-column: 1;
+}
+
+#sidebar > *:nth-child(2) {
+    -ms-grid-row: 3;
+    -ms-grid-column: 1;
+}
+
+#sidebar > *:nth-child(3) {
+    -ms-grid-row: 5;
+    -ms-grid-column: 1;
 }
 
 #sidebar section {
     margin: 0;
-    grid-column-start: 1;
+    -ms-grid-column: 1;
+        grid-column-start: 1;
+    -ms-grid-column-span: 0;
     grid-column-end: 1;
     background-color: white;
     padding: 0px 15px;
+    display: -webkit-box;
+    display: -ms-flexbox;
     display: flex;
-    justify-content: center;
+    -webkit-box-pack: center;
+        -ms-flex-pack: center;
+            justify-content: center;
 }
 
 #sidebar #logo-container {
     padding: 5px;
-    grid-row-start: 1;
+    -ms-grid-row: 1;
+        grid-row-start: 1;
+    -ms-grid-row-span: 0;
     grid-row-end: 1;
+    display: -webkit-box;
+    display: -ms-flexbox;
     display: flex;
-    justify-content: center;
-    align-items: center;
+    -webkit-box-pack: center;
+        -ms-flex-pack: center;
+            justify-content: center;
+    -webkit-box-align: center;
+        -ms-flex-align: center;
+            align-items: center;
     
 }
 
@@ -108,14 +165,18 @@ main {
 }
 
 #sidebar #about-map {
-    grid-row-start: 2;
+    -ms-grid-row: 2;
+        grid-row-start: 2;
+    -ms-grid-row-span: 0;
     grid-row-end: 2;
     font-size: 1.5em;
     
 }
 
 #sidebar #designer-list {
-    grid-row-start: 3;
+    -ms-grid-row: 3;
+        grid-row-start: 3;
+    -ms-grid-row-span: 0;
     grid-row-end: 3;
     overflow-y: scroll;
 }
@@ -192,14 +253,28 @@ main {
     display: none;
     background-color: #31939B;
     color: #31939B;
+    -ms-grid-columns: 150px 10px auto;
     grid-template-columns: 150px auto;
+    -ms-grid-rows: 100fr;
     grid-template-rows: 100fr;
     grid-gap: 10px;
     padding: 10px; 
     font-family: dinRegular;
-    order: 1;
+    -webkit-box-ordinal-group: 2;
+        -ms-flex-order: 1;
+            order: 1;
     z-index: 1;
     /* margin-bottom: 100px; */
+}
+
+#mobile-sidebar > *:nth-child(1) {
+    -ms-grid-row: 1;
+    -ms-grid-column: 1;
+}
+
+#mobile-sidebar > *:nth-child(2) {
+    -ms-grid-row: 1;
+    -ms-grid-column: 3;
 }
 
 #mobile-sidebar section {
@@ -207,8 +282,12 @@ main {
 }
 
 #mobile-logo-container {
+    display: -webkit-box;
+    display: -ms-flexbox;
     display: flex;
-    justify-content: center;
+    -webkit-box-pack: center;
+        -ms-flex-pack: center;
+            justify-content: center;
     height: 100%;
     /* justify-content: center;
     align-items: center; */
@@ -219,9 +298,13 @@ main {
 /* the coped logo */
 #mobile-logo-container img {
     /* display: none; */
-    grid-row-start: 1;
+    -ms-grid-row: 1;
+        grid-row-start: 1;
+    -ms-grid-row-span: 0;
     grid-row-end: 1;
-    grid-column-start: 1;
+    -ms-grid-column: 1;
+        grid-column-start: 1;
+    -ms-grid-column-span: 0;
     grid-column-end: 1;
     min-width: 20px;
     /* width: 90%; */
@@ -229,8 +312,12 @@ main {
 }
 
 #button-container {
+    display: -webkit-box;
+    display: -ms-flexbox;
     display: flex;
-    justify-content: flex-end;
+    -webkit-box-pack: end;
+        -ms-flex-pack: end;
+            justify-content: flex-end;
     /* align-items: center; */
     /* height: 10px; */
 }
@@ -312,11 +399,16 @@ main {
 
 @media screen and (max-width: 992px) {
     main {
-        flex-direction: column;
+        -webkit-box-orient: vertical;
+        -webkit-box-direction: normal;
+            -ms-flex-direction: column;
+                flex-direction: column;
     }
 
     #map {
-        order: 2;
+        -webkit-box-ordinal-group: 3;
+            -ms-flex-order: 2;
+                order: 2;
         height: 100%;
     }
 
@@ -325,7 +417,7 @@ main {
     }
 
     #mobile-sidebar {
+        display: -ms-grid;
         display: grid;
     }
 }
-
