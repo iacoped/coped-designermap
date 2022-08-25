@@ -449,6 +449,27 @@ import { designerInfoHTML } from "./components/designerInfo.js";
                 // dropdownDOMEle.classList.add("hidden");
             });
 
+            const aboutDOMEle = document.querySelector("#mobile-about-map h2");
+            let aboutVisible = false;
+            const aboutContentDOMEle = document.querySelector("#mobile-about-map p");
+            aboutDOMEle.addEventListener("click", () => {
+                aboutVisible = !aboutVisible;
+                designerListVisible = false;
+                render();
+                // aboutContentDOMEle.classList.add("hidden");
+            });
+
+            const designerListDOMEle = document.querySelector("#mobile-designer-list h2");
+            let designerListVisible = false;
+            const designerListContentDOMEle = document.querySelector("#mobile-designer-list ul");
+            designerListDOMEle.addEventListener("click", () => {
+                designerListVisible = !designerListVisible;
+                
+                aboutVisible = false;
+                render();
+                // aboutContentDOMEle.classList.add("hidden");
+            });
+
             // populate list
             const listDOMEle = document.querySelector("#mobile-designer-list ul");
             const data = controller.getPeopleData();
@@ -460,6 +481,8 @@ import { designerInfoHTML } from "./components/designerInfo.js";
                     let listItemDOMEle = document.createElement("li");
                     listItemDOMEle.textContent = person.name;
                     listItemDOMEle.addEventListener("click", () => {
+                        dropdownVisible = false;
+                        render();
                         markerManager.manuallyShowPersonPopup(person);
                     });
                     listDOMEle.appendChild(listItemDOMEle);
@@ -468,6 +491,8 @@ import { designerInfoHTML } from "./components/designerInfo.js";
 
             function render() {
                 dropdownDOMEle.style.display = dropdownVisible ? "grid" : "none";
+                aboutContentDOMEle.style.display = aboutVisible ? "block" : "none";
+                designerListContentDOMEle.style.display = designerListVisible ? "block" : "none";
             }
             // public but state variable is private
             this.setDropdownState = (state) => {

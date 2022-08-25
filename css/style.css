@@ -188,7 +188,7 @@ main {
     height: 125px;
     min-height: 60px;
     max-height: 125px;
-    min-width: 300px;
+    min-width: 280px;
     display: none;
     background-color: #31939B;
     color: #31939B;
@@ -267,21 +267,30 @@ main {
     /* order: 1; */
 }
 
+/* #mobile-about-map div {
+    border: 2px blue solid;
+    width: 100%;
+} */
+
 #mobile-designer-list {
     max-height: 200px;
-    overflow-y: scroll;
+    
 }
 
 #mobile-designer-list ul {
+    max-height: 200px;
     list-style-type: none;
+    overflow-y: scroll;
     padding: 0;
 }
 
 #dropdown section {
+    /* border: 2px red solid; */
     padding: 15px;
 }
 
 #dropdown h2 {
+    /* border: 2px red solid; */
     font-weight: bold;
     font-size: 24px;
     margin: 0;
