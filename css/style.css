@@ -229,6 +229,7 @@ main {
     display: flex;
     justify-content: center;
     height: 100%;
+    padding: 10px;
 }
 
 /* the coped logo */
@@ -254,6 +255,8 @@ main {
 #button-container button {
     margin-right: 10px;
     height: 90%;
+    display: flex;
+    align-items: center;
 }
 
 #button-container img {
