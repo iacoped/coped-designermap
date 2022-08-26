@@ -17,22 +17,23 @@ import { designerInfoHTML } from "./components/designerInfo.js";
 
     // perhaps I will combine mapManager and markerManager into mapView since markers are on the mapview
     const mapManager = {
-        initialZoom: 4,
+        initialZoom: 3,
         minZoom: 2, 
         maxZoom: 15,
 
         initializeMap() {
             this.map = L.map('map', {
                 preferCanvas: true,
-                zoomSnap: 1,
+                // physical distance between latlngs changes by a factor of 2.
+                zoomSnap: 1, 
                 // worldCopyJump: true,
                 maxBounds: [ // stops leaflet from requesting tiles outside map bounds (causes HTTP 400)
-                    [-90, -180],
-                    [90, 180]
+                    [-90, -200],
+                    [90, 200]
                 ],
                 maxBoundsViscosity: 1.0,
             }
-            ).setView([37.439974, -100], this.initialZoom);
+            ).setView([37.439974, -120], this.initialZoom);
 
             L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/toner-background/{z}/{x}/{y}{r}.png', {
                 maxZoom: this.maxZoom,
