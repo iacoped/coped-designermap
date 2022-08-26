@@ -3,11 +3,10 @@
 - make sure code is supported on all browsers (maybe not IE?)
 - how to handle cases where it is impossible to split a group on all zoom levels meaning some info is never viewable
 - proper documentation (docstrings, etc.)
-- replace custom-made functionality that Leaflet already has built in (distance between two points, etc.)? 
 - 2 space indents (JS convention)
 - explain what the marker clustering algorithm is doing in the comments
 - more robust system for fallback map tile providers
 - cite code sources
 - keep commits smaller
 - test on various devices
-- make it so that tooltips are always visible after clicking on a person on the list
+- popup stays visible even when zooming in, just moves to correct location?

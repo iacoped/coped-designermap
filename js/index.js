@@ -18,7 +18,7 @@ import { designerInfoHTML } from "./components/designerInfo.js";
     // perhaps I will combine mapManager and markerManager into mapView since markers are on the mapview
     const mapManager = {
         minZoom: 3, 
-        maxZoom: 12,
+        maxZoom: 15,
 
         initializeMap() {
             this.map = L.map('map', {
@@ -31,7 +31,7 @@ import { designerInfoHTML } from "./components/designerInfo.js";
                 ],
                 maxBoundsViscosity: 1.0,
             }
-            ).setView([37.439974, -15.117188], 3);
+            ).setView([37.439974, -30.117188], 3);
 
             L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/toner-background/{z}/{x}/{y}{r}.png', {
                 maxZoom: this.maxZoom,
@@ -414,6 +414,16 @@ import { designerInfoHTML } from "./components/designerInfo.js";
 
                 factor++;
             }
+            // console.log(this.markersToRenderAtEachZoomLevel)
+            //check all markers split at last zoom level
+            // const keys = Object.keys(this.markersToRenderAtEachZoomLevel[mapManager.maxZoom])  
+            // console.log(keys);
+            // for (let key of keys) {
+            //     console.log(this.markersToRenderAtEachZoomLevel[mapManager.maxZoom][key])
+            // }
+            // for (let zoomLevel = mapManager.minZoom; zoomLevel <= mapManager.maxZoom; zoomLevel++) {
+
+            // }
         },
     }
 
@@ -545,7 +555,23 @@ import { designerInfoHTML } from "./components/designerInfo.js";
                     links: datum["link"]
                 })
                 
+                
             })
+            console.log(uniqueCoords);
+            // dummy data for testing
+            // for (let i = 0; i < 1000; i++) {
+            //     uniqueCoords['38.546719, -121.744339'].people.push({
+            //         // used to uniquely identify a person when they are selected in dropdown menu to see info
+            //         // b/c multiple people could have same names, can't use that to identify which person to show info
+            //         id: `dummy-${i}`, 
+            //         name: "dummy",
+            //         universityAffiliation: "dummy",
+            //         communityAffiliation: "dummy",
+            //         organization: "dummy",
+            //         links: "dummy"
+            //     })
+            // }
+
             return uniqueCoords;
         },
 
