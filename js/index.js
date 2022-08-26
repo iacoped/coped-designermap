@@ -194,7 +194,7 @@ import { designerInfoHTML } from "./components/designerInfo.js";
                         .bindPopup(designerInfoHTML(group.people[0]), 
                         {
                             minWidth: 300,
-                            maxWidth: 500,
+                            maxWidth: 400,
                             // maxHeight: 300,
                             closeButton: false,
                             className: "designer-info"

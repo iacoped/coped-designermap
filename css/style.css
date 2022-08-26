@@ -146,10 +146,27 @@ main {
     background-color: #31939B;
     color: #31939B;
     border-radius: 0px;
+
+    /* max-width: 50px; */
+}
+
+.designer-info .leaflet-popup-content {
+    /* width: 1000px; */
+    margin: 0;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    row-gap: 10px;
 }
 
 .designer-info .leaflet-popup-tip {
     background-color: #31939B;
+}
+
+.designer-info header {
+    display: inline;
+    margin: 0;
+    padding: 0;
 }
 
 .designer-info h2, .designer-info .about-designer {
@@ -157,6 +174,11 @@ main {
     padding-left: 20px;
     padding-top: 15px;
     padding-bottom: 15px;
+    margin: 0;
+}
+
+.about-designer {
+    word-wrap: break-word;
 }
 
 .designer-info h2 {
@@ -171,10 +193,6 @@ main {
 .designer-info .about-designer section {
     /* padding-top: 10px; */
     padding-bottom: 10px;
-}
-
-.designer-info header {
-    margin-bottom: 20px;
 }
 
 .hidden {
@@ -311,6 +329,7 @@ main {
     font-size: 24px;
     margin: 0;
     flex-grow: 1;
+
 }
 
 #add-to-map a {
