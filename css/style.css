@@ -163,18 +163,34 @@ main {
 }
 
 .designer-info header {
-    display: inline;
+    display: flex;
+    column-gap: 10px;
     margin: 0;
     padding: 0;
 }
+
+.popup-close-button-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    /* height: 40px;
+    width: 40px; */
+    background-color: white;
+    padding-left: 5px;
+    padding-right: 5px;
+    /* padding: 10px; */
+}
+
 
 .designer-info h2, .designer-info .about-designer {
     background-color: white;
     padding-left: 20px;
     padding-top: 15px;
     padding-bottom: 15px;
+    padding-right: 20px;
     margin: 0;
 }
+
 
 .about-designer {
     word-wrap: break-word;
@@ -182,6 +198,7 @@ main {
 
 .designer-info h2 {
     font-size: 1.5rem;
+    flex-grow: 1;
 }
 
 .designer-info .about-designer h3 {
@@ -243,7 +260,11 @@ main {
     min-width: 20px;
     /* width: 90%; */
     max-width: 150px;
-    padding: 10px;
+    /* 
+        putting the padding on the container instead of the image 
+        messes up the aspect ratio on iphone
+    */
+    padding: 10px; 
 }
 
 #button-container {

@@ -155,6 +155,7 @@ import { designerInfoHTML } from "./components/designerInfo.js";
                                 className: "designer-info",
                                 minWidth: 300,
                                 maxWidth: 400,
+                                closeButton: false,
                             })
                             .setLatLng(markerDOMEle.getLatLng())
                             .setContent(designerInfoHTML(personToShowInfo))
@@ -176,7 +177,6 @@ import { designerInfoHTML } from "./components/designerInfo.js";
             }
         },
 
-        // offset is only used with prediction method.
         actuallyRenderMarkersOnMap(markers, offset) {
             const markerKeys = Object.keys(markers);
             for (let i of markerKeys) {

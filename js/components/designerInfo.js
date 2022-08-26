@@ -2,6 +2,9 @@ export function designerInfoHTML(designerInfo) {
     return `
         <header>
             <h2>${designerInfo.name}</h2>
+            <section class="popup-close-button-wrapper">
+                <img src="./assets/images/icons8-close.svg" />
+            </section>
         </header>
         <section class="about-designer">
             <section class="university">
