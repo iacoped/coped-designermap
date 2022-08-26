@@ -65,6 +65,10 @@ import { designerInfoHTML } from "./components/designerInfo.js";
             this.map.on("zoomend", () => {
                 markerManager.renderMarkers();
             });
+
+            this.map.on("click", () => {
+                mobileSidebarView.setDropdownState(false);
+            })
         },
 
         // takes some time but isn't needed immediately, so I make it async
@@ -146,7 +150,9 @@ import { designerInfoHTML } from "./components/designerInfo.js";
                         // if marker doesn't have popup (means it's representing multiple people, create one)
                         if (!markerDOMEle.getPopup()) {
                             this.popupCreatedFromClickingOnListItem = L.popup({
-                                className: "designer-info"
+                                className: "designer-info",
+                                minWidth: 300,
+                                maxWidth: 400,
                             })
                             .setLatLng(markerDOMEle.getLatLng())
                             .setContent(designerInfoHTML(personToShowInfo))
@@ -239,7 +245,7 @@ import { designerInfoHTML } from "./components/designerInfo.js";
                                 .bindPopup(designerInfoHTML(subBubble), 
                                 {
                                     minWidth: 300,
-                                    maxWidth: 500,
+                                    maxWidth: 400,
                                     // maxHeight: 300,
                                     closeButton: false,
                                     className: "designer-info"

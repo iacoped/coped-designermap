@@ -139,6 +139,7 @@ main {
     background-color: #31939B;
 }
 
+/* LEAFLET POPUP STYLES */
 
 .designer-info .leaflet-popup-content-wrapper {
     font-family: dinRoundPro;
@@ -146,8 +147,6 @@ main {
     background-color: #31939B;
     color: #31939B;
     border-radius: 0px;
-
-    /* max-width: 50px; */
 }
 
 .designer-info .leaflet-popup-content {
