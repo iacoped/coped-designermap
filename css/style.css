@@ -255,12 +255,12 @@ main {
 /* 
     very strange bug that occurs if I try to center the img
     with flex on iphone: the button will MOVE when toggling the
-    dropdown.
+    dropdown. Hardcoding it so that it looks centered seems to work.
 */
 #button-container button {
     margin-right: 10px;
     height: 90%;
-    padding-top: 15px;
+    padding-top: 6px;
     /* display: flex;
     align-items: center; */
 } 
