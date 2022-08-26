@@ -11,3 +11,6 @@
 - test on various devices
 - popup stays visible even when zooming in, just moves to correct location?
 - tweak starting view on mobile so looks better
+- tweak how fast marker radius grows so doesn't look bad if dataset grows
+- maybe if tile fails to load, switch to geojson completely so doesn't look inconsistent
+- x button to popup
