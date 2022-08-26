@@ -17,7 +17,8 @@ import { designerInfoHTML } from "./components/designerInfo.js";
 
     // perhaps I will combine mapManager and markerManager into mapView since markers are on the mapview
     const mapManager = {
-        minZoom: 3, 
+        initialZoom: 3,
+        minZoom: 2, 
         maxZoom: 15,
 
         initializeMap() {
@@ -343,7 +344,7 @@ import { designerInfoHTML } from "./components/designerInfo.js";
             for (let zoomLevel = mapManager.minZoom; zoomLevel <= mapManager.maxZoom; zoomLevel++) {
                 for (let j = 0; j < referenceInfo.length; j++) {
                     // Assuming a zoomSnap value of 1 (see line 27, the visual distance between markers increases by a factor of 2 each zoom level.)
-                    let newDistance = referenceInfo[j].distance * (Math.pow(2, factor));
+                    let newDistance = referenceInfo[j].distance * (Math.pow(2, zoomLevel - mapManager.initialZoom));
                     const newMarkerCoordsInPx = getPointOnLineWithDistanceDirection(refPointInPxCoords, referenceInfo[j].originalMarkerCoordsInPx, newDistance);
                     
                     // if this key is already present, means it was already split at some lower zoom level.
