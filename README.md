@@ -10,3 +10,4 @@
 - keep commits smaller
 - test on various devices
 - popup stays visible even when zooming in, just moves to correct location?
+- tweak starting view on mobile so looks better

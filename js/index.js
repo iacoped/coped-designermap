@@ -33,7 +33,7 @@ import { designerInfoHTML } from "./components/designerInfo.js";
                 ],
                 maxBoundsViscosity: 1.0,
             }
-            ).setView([35, -100], this.initialZoom);
+            ).setView([35, -98], this.initialZoom);
 
             L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/toner-background/{z}/{x}/{y}{r}.png', {
                 maxZoom: this.maxZoom,
