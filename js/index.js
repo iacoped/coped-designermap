@@ -17,7 +17,7 @@ import { designerInfoHTML } from "./components/designerInfo.js";
 
     // perhaps I will combine mapManager and markerManager into mapView since markers are on the mapview
     const mapManager = {
-        initialZoom: 3,
+        initialZoom: 4,
         minZoom: 2, 
         maxZoom: 15,
 
@@ -32,7 +32,7 @@ import { designerInfoHTML } from "./components/designerInfo.js";
                 ],
                 maxBoundsViscosity: 1.0,
             }
-            ).setView([37.439974, -100], 3);
+            ).setView([37.439974, -100], this.initialZoom);
 
             L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/toner-background/{z}/{x}/{y}{r}.png', {
                 maxZoom: this.maxZoom,
