@@ -28,12 +28,12 @@ import { designerInfoHTML } from "./components/designerInfo.js";
                 zoomSnap: 1, 
                 // worldCopyJump: true,
                 maxBounds: [ // stops leaflet from requesting tiles outside map bounds (causes HTTP 400)
-                    [-90, -200],
+                    [-90, -225],
                     [90, 200]
                 ],
                 maxBoundsViscosity: 1.0,
             }
-            ).setView([37.439974, -70], this.initialZoom);
+            ).setView([37.439974, -100], this.initialZoom);
 
             L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/toner-background/{z}/{x}/{y}{r}.png', {
                 maxZoom: this.maxZoom,
