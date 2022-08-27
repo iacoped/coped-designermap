@@ -7,7 +7,7 @@ import { fetchJson } from "./utils/ajax/fetchJson.js";
 import { createDeepCopy } from "./utils/core/createDeepCopy.js";
 import { getPointOnLineWithDistanceDirection } from "./utils/geometry/getPointOnLineWithDistanceDirection.js";
 import { getDistanceBetweenTwoPoints } from "./utils/geometry/getDistanceBetweenTwoPoints.js";
-import { designerInfoHTML } from "./components/designerInfo.js";
+import { designerInfoPopup } from "./components/designerInfoPopup.js";
 (() => {
     'use strict';
     const model = {
@@ -116,7 +116,7 @@ import { designerInfoHTML } from "./components/designerInfo.js";
 
     const markerManager = {
         markerDOMEles: [],
-        singlePersonColor: "#7a7a89",
+        singlePersonColor: "#7A7A89",
         multiplePersonColor: "#31939B",
         markersToRenderAtEachZoomLevel: {},
         popupCreatedFromClickingOnListItem: null,
@@ -151,26 +151,12 @@ import { designerInfoHTML } from "./components/designerInfo.js";
     
                         // if marker doesn't have popup (means it's representing multiple people, create one)
                         if (!markerDOMEle.getPopup()) {
-                            this.popupCreatedFromClickingOnListItem = L.popup({
-                                className: "designer-info",
-                                minWidth: 300,
-                                maxWidth: 400,
-                                closeButton: false,
-                            })
-                            .setLatLng(markerDOMEle.getLatLng())
-                            .setContent(designerInfoHTML(personToShowInfo))
-                            .openOn(mapManager.map);
+                            this.popupCreatedFromClickingOnListItem = designerInfoPopup(personToShowInfo)
+                                .setLatLng(markerDOMEle.getLatLng())
+                                .openOn(mapManager.map);
                         } else {
                             markerDOMEle.openPopup();
                         }
-                        // console.log(markerDOMEle.getPopup());
-                        // let popup = L.popup({
-                        //     className: "designer-info"
-                        // })
-                        // .setLatLng(markerDOMEle.getLatLng())
-                        // .setContent(designerInfoHTML(personToShowInfo))
-                        // .openOn(mapManager.map);
-                        // markerDOMEle.setStyle({fillColor: "black"});
                     }
                     
                 }
@@ -198,15 +184,9 @@ import { designerInfoHTML } from "./components/designerInfo.js";
                                 fillOpacity: 1,
                                 people: group.people
                             }
-                        )
-                        .bindPopup(designerInfoHTML(group.people[0]), 
-                        {
-                            minWidth: 300,
-                            maxWidth: 400,
-                            // maxHeight: 300,
-                            closeButton: false,
-                            className: "designer-info"
-                        });
+                        );
+                        
+                        marker.bindPopup(designerInfoPopup(group.people[0]));
 
                         this.markerDOMEles.push(marker);
                         marker.addTo(mapManager.map);
@@ -244,14 +224,7 @@ import { designerInfoHTML } from "./components/designerInfo.js";
                                         people: [subBubble]
                                     }
                                 )
-                                .bindPopup(designerInfoHTML(subBubble), 
-                                {
-                                    minWidth: 300,
-                                    maxWidth: 400,
-                                    // maxHeight: 300,
-                                    closeButton: false,
-                                    className: "designer-info"
-                                });
+                                marker.bindPopup(designerInfoPopup(subBubble));
 
                                 this.markerDOMEles.push(marker);
                                 marker.addTo(mapManager.map);

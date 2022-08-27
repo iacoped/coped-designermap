@@ -147,10 +147,16 @@ main {
     background-color: #31939B;
     color: #31939B;
     border-radius: 0px;
+    margin: 0;
+    padding: 0;
 }
 
 .designer-info .leaflet-popup-content {
-    /* width: 1000px; */
+    margin: 0;
+    padding: 0;
+}
+
+.designer-info .designer-info-wrapper {
     margin: 0;
     padding: 10px;
     display: flex;
@@ -179,6 +185,12 @@ main {
     padding-left: 5px;
     padding-right: 5px;
     /* padding: 10px; */
+}
+
+.popup-close-button-wrapper button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 
