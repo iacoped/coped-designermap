@@ -435,9 +435,7 @@ import { designerInfoPopup } from "./components/designerInfoPopup.js";
             const dropdownDOMEle = document.querySelector("#dropdown");
             dropdownToggleDOMEle.addEventListener("click", () => {
                 this.setDropdownState(!dropdownVisible);
-                // dropdownDOMEle.style.display = "none";
                 render();
-                // dropdownDOMEle.classList.add("hidden");
             });
 
             const aboutDOMEle = document.querySelector("#about-toggler");
@@ -448,7 +446,6 @@ import { designerInfoPopup } from "./components/designerInfoPopup.js";
                 aboutVisible = !aboutVisible;
                 designerListVisible = false;
                 render();
-                // aboutContentDOMEle.classList.add("hidden");
             });
 
             const designerListDOMEle = document.querySelector("#designer-list-toggler");
@@ -457,10 +454,8 @@ import { designerInfoPopup } from "./components/designerInfoPopup.js";
             const designerListContentDOMEle = document.querySelector("#mobile-designer-list ul");
             designerListDOMEle.addEventListener("click", () => {
                 designerListVisible = !designerListVisible;
-                
                 aboutVisible = false;
                 render();
-                // aboutContentDOMEle.classList.add("hidden");
             });
 
             // populate list
@@ -533,10 +528,10 @@ import { designerInfoPopup } from "./components/designerInfoPopup.js";
                     universityAffiliation: datum["University affiliation"],
                     communityAffiliation: datum["Community Affiliation"],
                     organization: datum["Firm/Lab/Organization/\nCenter Name"],
-                    links: datum["link"]
+                    links: datum["link"] ? datum["link"].split(",") : []
                 })
-                
-                
+                console.log(datum["link"] ? datum["link"].split(",") : []);
+                console.log(datum["Full Name"])
             })
             console.log(uniqueCoords);
             // dummy data for testing

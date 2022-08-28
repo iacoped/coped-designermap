@@ -2,7 +2,7 @@ export function designerInfoPopup(designerInfo) {
     const popup = L.popup( 
     {
         minWidth: 300,
-        maxWidth: 400,
+        maxWidth: 350,
         // maxHeight: 300,
         closeButton: false,
         className: "designer-info"
@@ -36,25 +36,68 @@ export function designerInfoPopup(designerInfo) {
     // construct info section
     const designerInfoWrapper = document.createElement("section");
     designerInfoWrapper.classList.add("about-designer")
-    
-    designerInfoWrapper.innerHTML = `
-        <section class="university">
-            <h3>university affiliation</h3>
-            ${designerInfo.universityAffiliation ? designerInfo.universityAffiliation.toUpperCase() : "N/A"}
-        </section>
-        <section class="community">
-            <h3>community</h3>
-            ${designerInfo.communityAffiliation ? designerInfo.communityAffiliation.toUpperCase() : "N/A"}
-        </section>
-        <section class="organization">
-            <h3>lab/firm</h3>
-            ${designerInfo.organization ? designerInfo.organization.toUpperCase() : "N/A"}
-        </section>
-        <section class="links">
-            <h3>links</h3>
-            ${designerInfo.links ? designerInfo.links : "N/A"}
-        </section>
-    `
+
+    let designerInfoSection = document.createElement("section");
+    designerInfoSection.classList.add("university");
+    let sectionHeader = document.createElement("h3");
+    sectionHeader.textContent = "university affiliation";
+    designerInfoSection.appendChild(sectionHeader);
+    let sectionContent = document.createElement("span");
+    sectionContent.textContent = designerInfo.universityAffiliation ? designerInfo.universityAffiliation.toUpperCase() : "N/A";
+    designerInfoSection.appendChild(sectionContent);
+    designerInfoWrapper.appendChild(designerInfoSection);
+
+    designerInfoSection = document.createElement("section");
+    designerInfoSection.classList.add("community");
+    sectionHeader = document.createElement("h3");
+    sectionHeader.textContent = "community";
+    designerInfoSection.appendChild(sectionHeader);
+    sectionContent = document.createElement("span");
+    sectionContent.textContent = designerInfo.communityAffiliation ? designerInfo.communityAffiliation.toUpperCase() : "N/A"
+    designerInfoSection.appendChild(sectionContent);
+    designerInfoWrapper.appendChild(designerInfoSection);
+
+    designerInfoSection = document.createElement("section");
+    designerInfoSection.classList.add("organization");
+    sectionHeader = document.createElement("h3");
+    sectionHeader.textContent = "lab/firm";
+    designerInfoSection.appendChild(sectionHeader);
+    sectionContent = document.createElement("span");
+    sectionContent.textContent = designerInfo.organization ? designerInfo.organization.toUpperCase() : "N/A";
+    designerInfoSection.appendChild(sectionContent);
+
+    designerInfoWrapper.appendChild(designerInfoSection);
+
+    designerInfoSection = document.createElement("links");
+    designerInfoSection.classList.add("links");
+    sectionHeader = document.createElement("h3");
+    sectionHeader.textContent = "links";
+    designerInfoSection.appendChild(sectionHeader);
+    sectionContent = document.createElement("span");
+    sectionContent.textContent = designerInfo.links ? designerInfo.links : "N/A";
+    designerInfoSection.appendChild(sectionContent);
+
+    designerInfoWrapper.appendChild(designerInfoSection);
+
+    console.log(designerInfoWrapper);
+    // designerInfoWrapper.innerHTML = `
+    //     <section class="university">
+    //         <h3>university affiliation</h3>
+    //         ${designerInfo.universityAffiliation ? designerInfo.universityAffiliation.toUpperCase() : "N/A"}
+    //     </section>
+    //     <section class="community">
+    //         <h3>community</h3>
+    //         ${designerInfo.communityAffiliation ? designerInfo.communityAffiliation.toUpperCase() : "N/A"}
+    //     </section>
+    //     <section class="organization">
+    //         <h3>lab/firm</h3>
+    //         ${designerInfo.organization ? designerInfo.organization.toUpperCase() : "N/A"}
+    //     </section>
+    //     <section class="links">
+    //         <h3>links</h3>
+    //         ${designerInfo.links ? designerInfo.links : "N/A"}
+    //     </section>
+    // `
     
     popupWrapper.appendChild(header);
     popupWrapper.appendChild(designerInfoWrapper);

@@ -16,3 +16,4 @@
 - x button to popup
 - check for memory leaks?
 - make tooltip scrollable if exceeds certain height
+- choose content of title tag
