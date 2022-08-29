@@ -206,6 +206,8 @@ main {
 
 .about-designer {
     word-wrap: break-word;
+    overflow-y: auto;
+    max-height: 275px;
 }
 
 .designer-info h2 {
@@ -219,8 +221,21 @@ main {
 }
 
 .designer-info .about-designer section {
-    /* padding-top: 10px; */
     padding-bottom: 10px;
+}
+
+.designer-info ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+.designer-info a {
+    color: #31939B;
+}
+
+.designer-info a:hover {
+    text-decoration: underline;
 }
 
 .hidden {

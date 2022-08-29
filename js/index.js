@@ -507,7 +507,7 @@ import { designerInfoPopup } from "./components/designerInfoPopup.js";
 
         async loadAndProcessDataset() {
             const data = await d3.csv("./data/CoPED advisory list 2021-1.csv", d3.autoType);
-            data.sort((a,b) => b["Number"] - a["Number"]);
+            // data.sort((a,b) => b["Number"] - a["Number"]);
 
             // group data based on latitude and longitude
             let uniqueCoords = {};
@@ -520,18 +520,18 @@ import { designerInfoPopup } from "./components/designerInfoPopup.js";
                         people: []
                     };
                 }
-                uniqueCoords[latlnString].people.push({
+                const personData = {
                     // used to uniquely identify a person when they are selected in dropdown menu to see info
                     // b/c multiple people could have same names, can't use that to identify which person to show info
                     id: `${latlnString}-${uniqueCoords[latlnString].people.length}`, 
-                    name: datum["Full Name"],
-                    universityAffiliation: datum["University affiliation"],
-                    communityAffiliation: datum["Community Affiliation"],
-                    organization: datum["Firm/Lab/Organization/\nCenter Name"],
-                    links: datum["link"] ? datum["link"].split(",") : []
-                })
-                console.log(datum["link"] ? datum["link"].split(",") : []);
-                console.log(datum["Full Name"])
+                    name: String(datum["Full Name"]),
+                    universityAffiliation: datum["University affiliation"] ? String(datum["University affiliation"]) : "N/A",
+                    communityAffiliation: datum["Community Affiliation"] ? String(datum["Community Affiliation"]) : "N/A",
+                    organization: datum["Firm/Lab/Organization/\nCenter Name"] ? String(datum["Firm/Lab/Organization/\nCenter Name"]) : "N/A",
+                    // links seem to work fine even with newlines in them, for correctness I suppose they could be removed
+                    links: datum["link"] ? String(datum["link"]).split(",") : []
+                }
+                uniqueCoords[latlnString].people.push(personData)
             })
             console.log(uniqueCoords);
             // dummy data for testing
