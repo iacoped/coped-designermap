@@ -13,7 +13,6 @@
 - tweak starting view on mobile so looks better
 - tweak how fast marker radius grows so doesn't look bad if dataset grows
 - maybe if tile fails to load, switch to geojson completely so doesn't look inconsistent
-- x button to popup
 - check for memory leaks?
 - make tooltip scrollable if exceeds certain height
 - choose content of title tag
