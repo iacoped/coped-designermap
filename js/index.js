@@ -276,6 +276,7 @@ import { designerInfoPopup } from "./components/designerInfoPopup.js";
 
             const uniqueCoordsKeys = Object.keys(data);
 
+            // I use a dict for easy lookup, I use Object.keys whenever I need to iterate.
             for (let i = mapManager.minZoom; i <= mapManager.maxZoom; i++) {
                 this.markersToRenderAtEachZoomLevel[i] = {};
             }
