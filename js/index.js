@@ -493,7 +493,7 @@ import { designerInfoPopup } from "./components/designerInfoPopup.js";
                         // used to uniquely identify a person when they are selected in dropdown menu to see info
                         // b/c multiple people could have same names, can't use that to identify which person to show info
                         id: `${latlnString}-${uniqueCoords[latlnString].people.length}`, 
-                        name: String(datum["Full Name"]),
+                        name: datum["Full Name"] ? String(datum["Full Name"]) : "N/A",
                         universityAffiliation: datum["University Affiliation"] ? String(datum["University Affiliation"]) : "N/A",
                         communityAffiliation: datum["Community Affiliation"] ? String(datum["Community Affiliation"]) : "N/A",
                         organization: datum["Firm/Lab/Organization/\nCenter Name"] ? String(datum["Firm/Lab/Organization/\nCenter Name"]) : "N/A",
