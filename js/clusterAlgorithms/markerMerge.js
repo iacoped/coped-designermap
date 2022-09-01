@@ -11,7 +11,9 @@ import { getPointOnLineWithDistanceDirection } from "../utils/geometry/getPointO
 //            2. The loser is merged into the winner.
 //            3. The winner adjusts its radius and location in a certain way (see code)
 //            4. Mark the loser as inGroup (it should not be considered in future iterations)
-export function markerMergeV8(markers) {
+// Note that the output depends on the order in which the markers are considered.
+// Try sorting it to see how the order affects the visual difference (index.js line 475)
+export function markerMerge(markers) {
     const markerKeys = Object.keys(markers);
     let intersectionsStillExist = true; 
     while (intersectionsStillExist) {

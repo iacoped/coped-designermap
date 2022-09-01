@@ -1,8 +1,8 @@
 // Protip: https://stackoverflow.com/questions/23429203/weird-behavior-with-objects-console-log
-// import {csv} from "https://cdn.skypack.dev/d3-fetch@3"; // import just d3's csv capabilities without loading entire library
+import {csv} from "https://cdn.skypack.dev/d3-fetch@3"; // import just d3's csv capabilities without loading entire library
 
-import { markerMergeV8 } from "./clusterAlgorithms/markerMerge.js";
-import { markerSplitV3 } from "./clusterAlgorithms/markerSplit.js";
+import { markerMerge } from "./clusterAlgorithms/markerMerge.js";
+import { markerSplit } from "./clusterAlgorithms/markerSplit.js";
 import { fetchJson } from "./utils/ajax/fetchJson.js";
 import { createDeepCopy } from "./utils/core/createDeepCopy.js";
 import { getPointOnLineWithDistanceDirection } from "./utils/geometry/getPointOnLineWithDistanceDirection.js";
@@ -25,7 +25,7 @@ import { designerInfoPopup } from "./components/designerInfoPopup.js";
                 // physical distance between latlngs changes by a factor of ~2.
                 zoomSnap: 1, 
                 // worldCopyJump: true,
-                maxBounds: [ // stops leaflet from requesting tiles outside map bounds (causes HTTP 400)
+                maxBounds: [ 
                     [-90, -225],
                     [90, 225]
                 ],
@@ -38,10 +38,10 @@ import { designerInfoPopup } from "./components/designerInfoPopup.js";
                 minZoom: this.minZoom,
                 // errorTileUrl: '../assets/images/pexels-photo-376723-909353127.png', // fallback image when tile isn't available is just a white image
                 // https://stackoverflow.com/questions/47477956/nowrap-option-on-tilelayer-is-only-partially-working
-                bounds: [ // stops leaflet from requesting tiles outside map bounds (causes HTTP 400)
-                    [-90, -180],
-                    [90, 180]
-                ],
+                // bounds: [ // stops leaflet from requesting tiles outside map bounds (causes HTTP 400)
+                //     [-90, -180],
+                //     [90, 180]
+                // ],
             })
             .addTo(this.map);
             
@@ -336,8 +336,8 @@ import { designerInfoPopup } from "./components/designerInfoPopup.js";
                 }   
                 const radiusOfMarkerRepresentingOnePerson = 1 + Math.log(zoomLevel * 100);
                 // merge markers
-                this.markersToRenderAtEachZoomLevel[zoomLevel] = markerMergeV8(this.markersToRenderAtEachZoomLevel[zoomLevel]);
-                this.markersToRenderAtEachZoomLevel[zoomLevel] = markerSplitV3(this.markersToRenderAtEachZoomLevel[zoomLevel], radiusOfMarkerRepresentingOnePerson, this.seededRNG);
+                this.markersToRenderAtEachZoomLevel[zoomLevel] = markerMerge(this.markersToRenderAtEachZoomLevel[zoomLevel]);
+                this.markersToRenderAtEachZoomLevel[zoomLevel] = markerSplit(this.markersToRenderAtEachZoomLevel[zoomLevel], radiusOfMarkerRepresentingOnePerson, this.seededRNG);
 
                 /* 
                     To be visually consistent, circle that has already split into multiple markers at a 
@@ -471,7 +471,7 @@ import { designerInfoPopup } from "./components/designerInfoPopup.js";
         },
 
         async loadAndProcessDataset() {
-            const data = await d3.csv("./data/CoPED advisory list 2021-1.csv", d3.autoType);
+            const data = await csv("./data/CoPED advisory list 2021-1.csv");
             // data.sort((a,b) => b["Number"] - a["Number"]);
 
             // group data based on latitude and longitude

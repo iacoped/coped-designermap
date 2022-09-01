@@ -9,7 +9,7 @@ import { getTwoCirclesIntersectionInfo } from "../utils/geometry/getTwoCirclesIn
 // else, for markers who rep N > 1 person, split them into N markers reping 1 person if: 
 // radius x 2 circle doesn't intersect with any markers?
 
-export function markerSplitV3(markers, radiusOfMarkerRepresentingOnePerson, seededRNG) {
+export function markerSplit(markers, radiusOfMarkerRepresentingOnePerson, seededRNG) {
     const markerKeys = Object.keys(markers);
     for (let i of markerKeys) {
         const c1 = markers[i];
