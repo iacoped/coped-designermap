@@ -479,26 +479,29 @@ import { designerInfoPopup } from "./components/designerInfoPopup.js";
             // group data based on latitude and longitude
             let uniqueCoords = {};
             data.forEach(datum => {
-                const latlnString = `${datum["Latitude"]}, ${datum["Longitude"]}`;
-                if (!(latlnString in uniqueCoords)) {
-                    uniqueCoords[latlnString] = {
-                        lat: datum["Latitude"],
-                        lng: datum["Longitude"],
-                        people: []
-                    };
+                // person must at least have a valid latlng to show up on the map
+                if (datum["Latitude"] && datum["Longitude"]) {
+                    const latlnString = `${datum["Latitude"]}, ${datum["Longitude"]}`;
+                    if (!(latlnString in uniqueCoords)) {
+                        uniqueCoords[latlnString] = {
+                            lat: datum["Latitude"],
+                            lng: datum["Longitude"],
+                            people: []
+                        };
+                    }
+                    const personData = {
+                        // used to uniquely identify a person when they are selected in dropdown menu to see info
+                        // b/c multiple people could have same names, can't use that to identify which person to show info
+                        id: `${latlnString}-${uniqueCoords[latlnString].people.length}`, 
+                        name: String(datum["Full Name"]),
+                        universityAffiliation: datum["University Affiliation"] ? String(datum["University Affiliation"]) : "N/A",
+                        communityAffiliation: datum["Community Affiliation"] ? String(datum["Community Affiliation"]) : "N/A",
+                        organization: datum["Firm/Lab/Organization/\nCenter Name"] ? String(datum["Firm/Lab/Organization/\nCenter Name"]) : "N/A",
+                        // links seem to work fine even with newlines in them, for correctness I suppose they could be removed
+                        links: datum["Links"] ? String(datum["Links"]).split(",") : []
+                    }
+                    uniqueCoords[latlnString].people.push(personData)
                 }
-                const personData = {
-                    // used to uniquely identify a person when they are selected in dropdown menu to see info
-                    // b/c multiple people could have same names, can't use that to identify which person to show info
-                    id: `${latlnString}-${uniqueCoords[latlnString].people.length}`, 
-                    name: String(datum["Full Name"]),
-                    universityAffiliation: datum["University Affiliation"] ? String(datum["University Affiliation"]) : "N/A",
-                    communityAffiliation: datum["Community Affiliation"] ? String(datum["Community Affiliation"]) : "N/A",
-                    organization: datum["Firm/Lab/Organization/\nCenter Name"] ? String(datum["Firm/Lab/Organization/\nCenter Name"]) : "N/A",
-                    // links seem to work fine even with newlines in them, for correctness I suppose they could be removed
-                    links: datum["Links"] ? String(datum["Links"]).split(",") : []
-                }
-                uniqueCoords[latlnString].people.push(personData)
             })
 
             return uniqueCoords;
