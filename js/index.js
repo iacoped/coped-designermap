@@ -472,7 +472,7 @@ import { designerInfoPopup } from "./components/designerInfoPopup.js";
         },
 
         async loadAndProcessDataset() {
-            const data = await csv("./data/CoPED advisory list 2021-1.csv");
+            const data = await csv("./data/CoPED_Designer_List.csv");
             // data.sort((a,b) => b["Number"] - a["Number"]);
 
             // group data based on latitude and longitude
