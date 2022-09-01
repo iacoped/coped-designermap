@@ -21,7 +21,6 @@ export function getDirectionOfP2RelativeToP1(p1, p2) {
             return "below it";
         }
     } else {
-        // slope = getSlopeGivenTwoPoints(p1, p2);
         if (p1.x > p2.x && p1.y < p2.y) {
             return "its upper left";
         } else if (p1.x < p2.x && p1.y > p2.y) {

@@ -18,10 +18,6 @@
     font-weight: bold;
 }
 
-a {
-    text-decoration: none;
-}
-
 /* https://alvarotrigo.com/blog/how-to-create-websites-fullscreen-sections-html-and-css/ */
 html,
 body {
@@ -29,6 +25,10 @@ body {
     height: 100vh;
     width: 100vw;
     font-size: 100%;
+}
+
+a {
+    color: #31939B;
 }
 
 button {
@@ -46,9 +46,6 @@ main {
     flex-direction: row;
     height: 100vh;
     width: 100vw;
-    /* grid-template-columns: 80fr 20fr;
-    grid-template-rows: 100fr; */
-    /* justify-content: stretch; */
 }
 
 #map { 
@@ -73,12 +70,9 @@ main {
     padding: 15px;
     z-index: 1;
     background-color: #31939B;
-    /* height: 100vh; */
-    /* width: 17vw; */
     color: #31939B;
     font-family: dinRegular;
     max-width: 300px;
-    /* width: 30vw; */
     justify-items: stretch;
     order: 2;
 }
@@ -104,16 +98,13 @@ main {
 }
 
 #sidebar img {
-    /* border: 2px red solid; */
     max-width: 100%;
-    /* max-height: 100%; */
 }
 
 #sidebar #about-map {
     grid-row-start: 2;
     grid-row-end: 2;
     font-size: 1.5em;
-    /* font-size: 3vh; */
     
 }
 
@@ -130,11 +121,9 @@ main {
 
 #sidebar #designer-list ul li {
     cursor: pointer;
-    /* border: 2px red solid; */
 }
 
 #sidebar #designer-list ul li:hover {
-    /* cursor: pointer; */
     color: white;
     background-color: #31939B;
 }
@@ -179,12 +168,9 @@ main {
     display: flex;
     justify-content: center;
     align-items: center;
-    /* height: 40px;
-    width: 40px; */
     background-color: white;
     padding-left: 10px;
     padding-right: 10px;
-    /* padding: 10px; */
 }
 
 .popup-close-button-wrapper button {
@@ -246,9 +232,6 @@ main {
 
 #mobile-sidebar {
     position: relative;
-    /* height: 10vh; */
-    /* height: 200px; */
-    /* height: 20vw; */
     height: 125px;
     min-height: 60px;
     max-height: 125px;
@@ -273,19 +256,16 @@ main {
     display: flex;
     justify-content: center;
     height: 100%;
-    /* padding: 10px; */
 }
 
 /* the coped logo */
 #mobile-logo-container img {
     display: inline;
-    /* display: none; */
     grid-row-start: 1;
     grid-row-end: 1;
     grid-column-start: 1;
     grid-column-end: 1;
     min-width: 20px;
-    /* width: 90%; */
     max-width: 150px;
     /* 
         putting the padding on the container instead of the image 
@@ -332,30 +312,20 @@ main {
 }
 
 #mobile-designer-list {
-    /* position: absolute; */
-    /* max-height: 300px */
-    /* height: 200px; */
     overflow-y: hidden;
 }
 
 #mobile-designer-list ul {
-    /* border: 2px red solid; */
     max-height: 140px;
-    /* max-height: 10%; */
     list-style-type: none;
     overflow-y: scroll;
-    /* padding: 0; */
     padding-top: 5px;
-    /* padding: 10px 10px 10px 0px; */
     margin: 10px 10px 10px 0px;
 }
 
 #dropdown section {
-    /* border: 2px red solid; */
-    /* padding: 15px; */
     display: flex;
     flex-direction: column;
-    /* align-items: stretch; */
 }
 
 #dropdown img {
@@ -368,7 +338,6 @@ main {
 }
 
 #dropdown div, #dropdown a {
-    /* border: 2px blue solid; */
     padding: 15px;
 }
 
@@ -378,10 +347,6 @@ main {
 }
 
 #dropdown h2 {
-    /* flex-grow: 1; */
-    /* width: 100vh; */
-    /* vertical-align: middle; */
-    /* border: 2px red solid; */
     font-weight: bold;
     font-size: 24px;
     margin: 0;
@@ -392,8 +357,7 @@ main {
 #add-to-map a {
     vertical-align: middle;
     display: inline-block;
-    /* padding-top: 50px; */
-    /* padding-left: 10px; */
+    text-decoration: none;
     color: #31939B;
     font-size: 24px;
     font-weight: bold;

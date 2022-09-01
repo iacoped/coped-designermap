@@ -2,23 +2,18 @@ import { getRandCoordsWithinCircle } from "../utils/geometry/getRandCoordsWithin
 import { getDistanceBetweenTwoPoints } from "../utils/geometry/getDistanceBetweenTwoPoints.js";
 import { getTwoCirclesIntersectionInfo } from "../utils/geometry/getTwoCirclesIntersectionInfo.js";
 /** 
-* splits a marker representing N indiviudals into N markers each representing 1 individual.
-* @summary If the description is long, write your summary here. Otherwise, feel free to remove this.
-* @param {ParamDataTypeHere} parameterNameHere - Brief description of the parameter here. Note: For other notations of data types, please refer to JSDocs: DataTypes command.
-* @return {ReturnValueDataTypeHere} Brief description of the returning value here.
+* splits markers representing N indiviudals into N markers each representing 1 individual.
 */
 
 // At any zoom level, after merging, if marker reps just 1 person, make it clickable and show that person's info. 
 // else, for markers who rep N > 1 person, split them into N markers reping 1 person if: 
 // radius x 2 circle doesn't intersect with any markers?
 
-export function markerSplitV3(markers, radiusOfMarkerRepresentingOnePerson, seededRNG) {
-    // let splitMarkers = [];
+export function markerSplit(markers, radiusOfMarkerRepresentingOnePerson, seededRNG) {
     const markerKeys = Object.keys(markers);
     for (let i of markerKeys) {
         const c1 = markers[i];
         if (c1.inGroup || c1.static) {
-            // splitMarkers.push(c1);
             continue;
         }
         // TODO: add additional rule determining if split occurs or not
@@ -35,24 +30,9 @@ export function markerSplitV3(markers, radiusOfMarkerRepresentingOnePerson, seed
             let r2 = c2.radius;
             const intersectionInfo = getTwoCirclesIntersectionInfo(r1, r2, distance);
             if (intersectionInfo.intersects) {
-                // console.log("no split");
                 splitAllowed = false;
             }
         }
-
-        // for (let j of splitMarkers) {
-        //     if (j.inGroup || i.id === j.id) {
-        //         continue;
-        //     }
-        //     const distance = getDistanceBetweenTwoPoints(i.coords, j.coords);
-        //     let r1 = radiusOfCircleForSplitting;
-        //     let r2 = j.radius;
-        //     const intersectionInfo = getTwoCirclesIntersectionInfo(r1, r2, distance);
-        //     if (intersectionInfo.intersects) {
-        //         // console.log("no split");
-        //         splitAllowed = false;
-        //     }
-        // }
 
         if (c1.people.length > 1 && splitAllowed) {
             
@@ -110,11 +90,8 @@ export function markerSplitV3(markers, radiusOfMarkerRepresentingOnePerson, seed
             } else {
                 c1.split = false;
             }
-            // splitMarkers.push(c1);
-
         } else {
             c1.split = false;
-            // splitMarkers.push(c1);
         }
     }
     return markers;
