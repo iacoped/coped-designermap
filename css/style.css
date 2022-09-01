@@ -19,7 +19,7 @@
 }
 
 a {
-    text-decoration: none;
+    color: #31939B;
 }
 
 /* https://alvarotrigo.com/blog/how-to-create-websites-fullscreen-sections-html-and-css/ */
@@ -394,6 +394,7 @@ main {
     display: inline-block;
     /* padding-top: 50px; */
     /* padding-left: 10px; */
+    text-decoration: none;
     color: #31939B;
     font-size: 24px;
     font-weight: bold;

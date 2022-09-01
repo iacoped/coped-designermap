@@ -12,10 +12,8 @@ import { designerInfoPopup } from "./components/designerInfoPopup.js";
     'use strict';
     const model = {
         data: null,
-        selectedMarkerData: null,
     }
 
-    // perhaps I will combine mapManager and markerManager into mapView since markers are on the mapview
     const mapManager = {
         initialZoom: 3,
         minZoom: 2, 
@@ -24,7 +22,7 @@ import { designerInfoPopup } from "./components/designerInfoPopup.js";
         initializeMap() {
             this.map = L.map('map', {
                 preferCanvas: true,
-                // physical distance between latlngs changes by a factor of 2.
+                // physical distance between latlngs changes by a factor of ~2.
                 zoomSnap: 1, 
                 // worldCopyJump: true,
                 maxBounds: [ // stops leaflet from requesting tiles outside map bounds (causes HTTP 400)
@@ -39,7 +37,6 @@ import { designerInfoPopup } from "./components/designerInfoPopup.js";
                 maxZoom: this.maxZoom,
                 minZoom: this.minZoom,
                 // errorTileUrl: '../assets/images/pexels-photo-376723-909353127.png', // fallback image when tile isn't available is just a white image
-                // noWrap: true,
                 // https://stackoverflow.com/questions/47477956/nowrap-option-on-tilelayer-is-only-partially-working
                 bounds: [ // stops leaflet from requesting tiles outside map bounds (causes HTTP 400)
                     [-90, -180],
@@ -53,13 +50,6 @@ import { designerInfoPopup } from "./components/designerInfoPopup.js";
             })
             .addAttribution(`Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors`)
             .addTo(this.map);
-
-            // console.log("map init done")
-            //     // sometimes grey area happens, sometimes it doesn't, this hoepfully helps it guaranteed not problem
-            //     // think the problem happens when I change the height of the map via css and live reloads the map
-            //     // this code should prevent this from happening when resizing the map in the css
-            //     //https://stackoverflow.com/questions/19564366/unwanted-gray-area-on-map
-            //     setTimeout(this.map.invalidateSize.bind(this.map));`
         },
 
         attachEventHandlersToMap() {
@@ -75,7 +65,6 @@ import { designerInfoPopup } from "./components/designerInfoPopup.js";
 
         // takes some time but isn't needed immediately, so I make it async
         async initializeGeoJSONLayers() {
-            // console.log("add geojsonLayers start")
             // https://gis.stackexchange.com/questions/380874/leaflet-draw-vector-layer-behind-tile-layer
             // https://leafletjs.com/examples/map-panes/
             // allows us to display the geoJSON layer behind the tile layer, so if a tile can't be loaded, the geoJSON is shown.
@@ -110,7 +99,6 @@ import { designerInfoPopup } from "./components/designerInfoPopup.js";
 
             bodiesOfWaterLayer.addTo(this.map);
 
-            // console.log("geojson adding done");
         },
     }
 
@@ -129,7 +117,6 @@ import { designerInfoPopup } from "./components/designerInfoPopup.js";
         init() {
             this.computeMarkerStateAtEachZoomLevel();
             this.renderMarkers();
-            // console.log("markers rendered");
         },
 
         removeMarkersFromMap() {
@@ -140,12 +127,7 @@ import { designerInfoPopup } from "./components/designerInfoPopup.js";
         },
 
         manuallyShowPersonPopup(personToShowInfo) {
-            // const currentZoomLevel = mapManager.map.getZoom();
-            // const ref = this.markersToRenderAtEachZoomLevel[currentZoomLevel];
-            // const keys = Object.keys(ref);
             for (const markerDOMEle of this.markerDOMEles) {
-                // console.log(markerDOMEle);
-                // console.log(markerDOMEle.options.people);
                 for (const person of markerDOMEle.options.people) {
                     if (person.id === personToShowInfo.id) {
     
@@ -287,7 +269,6 @@ import { designerInfoPopup } from "./components/designerInfoPopup.js";
         // somewhat inaccurate b/c some latlngs are close enough that px coordinates are the same, 
         // so predictions become inaccurate since they rely solely on rendering based on pixel coordinates.
         computeMarkerStateAtEachZoomLevel() {
-            // console.log("compute marker state start");
             // distance in px between this and all markers computed
             const data = controller.getPeopleData();
             let refPointInPxCoords = mapManager.map.latLngToContainerPoint(this.referencePoint.posInLatLng);
@@ -381,12 +362,6 @@ import { designerInfoPopup } from "./components/designerInfoPopup.js";
                                 }
                                 this.markersToRenderAtEachZoomLevel[zoom][member] = {
                                     inGroup: true,
-                                    // id: member,
-                                    // coords: markerCoordsInPx,
-                                    // radius: data[uniqueCoordsKeys[j]].people.length + Math.log(zoomLevel * 100),
-                                    // people: data[uniqueCoordsKeys[j]].people,
-                                    // members: [`group-${j}`],
-                                    // inGroup: false
                                 }
                             }
                         }
@@ -395,16 +370,6 @@ import { designerInfoPopup } from "./components/designerInfoPopup.js";
 
                 factor++;
             }
-            // console.log(this.markersToRenderAtEachZoomLevel)
-            //check all markers split at last zoom level
-            // const keys = Object.keys(this.markersToRenderAtEachZoomLevel[mapManager.maxZoom])  
-            // console.log(keys);
-            // for (let key of keys) {
-            //     console.log(this.markersToRenderAtEachZoomLevel[mapManager.maxZoom][key])
-            // }
-            // for (let zoomLevel = mapManager.minZoom; zoomLevel <= mapManager.maxZoom; zoomLevel++) {
-
-            // }
         },
     }
 
@@ -533,20 +498,6 @@ import { designerInfoPopup } from "./components/designerInfoPopup.js";
                 }
                 uniqueCoords[latlnString].people.push(personData)
             })
-            console.log(uniqueCoords);
-            // dummy data for testing
-            // for (let i = 0; i < 1000; i++) {
-            //     uniqueCoords['38.546719, -121.744339'].people.push({
-            //         // used to uniquely identify a person when they are selected in dropdown menu to see info
-            //         // b/c multiple people could have same names, can't use that to identify which person to show info
-            //         id: `dummy-${i}`, 
-            //         name: "dummy",
-            //         universityAffiliation: "dummy",
-            //         communityAffiliation: "dummy",
-            //         organization: "dummy",
-            //         links: "dummy"
-            //     })
-            // }
 
             return uniqueCoords;
         },
@@ -557,15 +508,6 @@ import { designerInfoPopup } from "./components/designerInfoPopup.js";
 
         setPeopleData(data) {
             model.data = data;
-        },
-
-        setSelectedMarkerData(data) {
-            model.selectedMarkerData = data;
-            controlPanelView.render();
-        },
-
-        getSelectedMarkerData() {
-            return model.selectedMarkerData;
         },
     }
     
