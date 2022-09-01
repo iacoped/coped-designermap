@@ -473,6 +473,7 @@ import { designerInfoPopup } from "./components/designerInfoPopup.js";
 
         async loadAndProcessDataset() {
             const data = await csv("./data/CoPED_Designer_List.csv");
+            console.log(data);
             // data.sort((a,b) => b["Number"] - a["Number"]);
 
             // group data based on latitude and longitude
@@ -491,11 +492,11 @@ import { designerInfoPopup } from "./components/designerInfoPopup.js";
                     // b/c multiple people could have same names, can't use that to identify which person to show info
                     id: `${latlnString}-${uniqueCoords[latlnString].people.length}`, 
                     name: String(datum["Full Name"]),
-                    universityAffiliation: datum["University affiliation"] ? String(datum["University affiliation"]) : "N/A",
+                    universityAffiliation: datum["University Affiliation"] ? String(datum["University Affiliation"]) : "N/A",
                     communityAffiliation: datum["Community Affiliation"] ? String(datum["Community Affiliation"]) : "N/A",
                     organization: datum["Firm/Lab/Organization/\nCenter Name"] ? String(datum["Firm/Lab/Organization/\nCenter Name"]) : "N/A",
                     // links seem to work fine even with newlines in them, for correctness I suppose they could be removed
-                    links: datum["link"] ? String(datum["link"]).split(",") : []
+                    links: datum["Links"] ? String(datum["Links"]).split(",") : []
                 }
                 uniqueCoords[latlnString].people.push(personData)
             })
