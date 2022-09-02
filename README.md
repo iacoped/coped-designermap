@@ -1,18 +1,13 @@
-# TODO
-- guide for future maintainers of the project
-- make sure code is supported on all browsers (maybe not IE?)
-- how to handle cases where it is impossible to split a group on all zoom levels meaning some info is never viewable
-- proper documentation (docstrings, etc.)
+# TODO / Suggestions
+- Refactor CSS to be more readable, maintainable
+- Proper explanation of what markerManager.computeMarkerState() is doing
+- make sure code is supported on all browsers
+- ensure page looks good on various devices
+- make tooltip size scale better with different device sizes 
+- Dynamic max zoom level instead of hardcoded value (basically, if a marker does not have space to split at the max zoom level, increase the max zoom level until it has enough space)
 - 2 space indents (JS convention)
-- explain what the marker clustering algorithm is doing in the comments
 - more robust system for fallback map tile providers
-- cite code sources
-- keep commits smaller
-- test on various devices
-- popup stays visible even when zooming in, just moves to correct location?
-- tweak starting view on mobile so looks better
+- Popups could stay visible when zoom level changes, location simply moves with the person's new location
 - tweak how fast marker radius grows so doesn't look bad if dataset grows
-- maybe if tile fails to load, switch to geojson completely so doesn't look inconsistent
-- check for memory leaks?
-- make tooltip scrollable if exceeds certain height
-- choose content of title tag
+- If tile fails to load, switch to geojson completely so doesn't look inconsistent?
+- check for memory leaks

@@ -192,8 +192,8 @@ main {
 
 .about-designer {
     word-wrap: break-word;
-    overflow-y: auto;
-    max-height: 275px;
+    /* overflow-y: auto;
+    max-height: 275px; */
 }
 
 .designer-info h2 {
