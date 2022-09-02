@@ -3,6 +3,7 @@
 - Proper explanation of what markerManager.computeMarkerState() is doing
 - make sure code is supported on all browsers
 - ensure page looks good on various devices
+- better browser tab icon
 - make tooltip size scale better with different device sizes 
 - Dynamic max zoom level instead of hardcoded value (basically, if a marker does not have space to split at the max zoom level, increase the max zoom level until it has enough space)
 - 2 space indents (JS convention)
