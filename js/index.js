@@ -473,7 +473,7 @@ import { designerInfoPopup } from "./components/designerInfoPopup.js";
 
         async loadAndProcessDataset() {
             const data = await csv("./data/CoPED_Designer_List.csv");
-            console.log(data);
+            // console.log(data);
             // data.sort((a,b) => b["Number"] - a["Number"]);
 
             // group data based on latitude and longitude
@@ -490,7 +490,7 @@ import { designerInfoPopup } from "./components/designerInfoPopup.js";
                         };
                     }
                     const personData = {
-                        // used to uniquely identify a person when they are selected in dropdown menu to see info
+                        // id used to uniquely identify a person when they are selected in sidebar list to see info
                         // b/c multiple people could have same names, can't use that to identify which person to show info
                         id: `${latlnString}-${uniqueCoords[latlnString].people.length}`, 
                         name: datum["Full Name"] ? String(datum["Full Name"]) : "N/A",
